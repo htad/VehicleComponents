@@ -22,6 +22,10 @@ component FullVehicle
     cylinder_radius = 0
   ) {^body}
   corner_fl = VehicleComponents.CornerAssembly(
+    motor(
+      final motor_type = motor_type,
+      final gear_ratio = gear_ratio
+    ),
     wheel_assembly(
       tire(
         is_left = true,
@@ -40,6 +44,10 @@ component FullVehicle
     )
   ) {^corner_fl}
   corner_fr = VehicleComponents.CornerAssembly(
+    motor(
+      final motor_type = motor_type,
+      final gear_ratio = gear_ratio
+    ),
     wheel_assembly(
       tire(
         is_left = false,
@@ -58,6 +66,10 @@ component FullVehicle
     )
   ) {^corner_fr}
   corner_rl = VehicleComponents.CornerAssembly(
+    motor(
+      final motor_type = motor_type,
+      final gear_ratio = gear_ratio
+    ),
     wheel_assembly(
       tire(
         is_left = true,
@@ -76,6 +88,10 @@ component FullVehicle
     )
   ) {^corner_rl}
   corner_rr = VehicleComponents.CornerAssembly(
+    motor(
+      final motor_type = motor_type,
+      final gear_ratio = gear_ratio
+    ),
     wheel_assembly(
       tire(
         is_left = false,
@@ -113,10 +129,11 @@ component FullVehicle
       roll_damper_extension_rear
     )
   ) {^rear_suspension}
-  control = VehicleComponents.VehicleControl() {^control}
+  control = VehicleComponents.VehicleControl(final motor_type = motor_type) {^control}
   aero = VehicleComponents.AeroLoad() {^aero}
   body_angles = MultibodyComponents.AbsoluteAngles(sequence = [3, 2, 1]) {^body_angles}
 
+  structural parameter motor_type::String
   structural parameter heave_damper_compression_front::String
   structural parameter heave_damper_extension_front::String
   structural parameter roll_damper_compression_front::String
@@ -130,6 +147,7 @@ component FullVehicle
   structural parameter road_n_min::Real
   structural parameter road_n_max::Real
 
+  parameter gear_ratio::Real
   parameter vehicle_name::String
   parameter brake_bias::Real
   parameter max_brake_torque::Torque
@@ -150,10 +168,14 @@ relations
   control.inputs.slip_fr = corner_fr.outputs.slip
   control.inputs.slip_rl = corner_rl.outputs.slip
   control.inputs.slip_rr = corner_rr.outputs.slip
-  control.inputs.full_demand_power_fl = corner_fl.outputs.full_demand_power
-  control.inputs.full_demand_power_fr = corner_fr.outputs.full_demand_power
-  control.inputs.full_demand_power_rl = corner_rl.outputs.full_demand_power
-  control.inputs.full_demand_power_rr = corner_rr.outputs.full_demand_power
+  control.inputs.motor_speed_fl = corner_fl.outputs.motor_speed
+  control.inputs.available_torque_fl = corner_fl.outputs.available_torque
+  control.inputs.motor_speed_fr = corner_fr.outputs.motor_speed
+  control.inputs.available_torque_fr = corner_fr.outputs.available_torque
+  control.inputs.motor_speed_rl = corner_rl.outputs.motor_speed
+  control.inputs.available_torque_rl = corner_rl.outputs.available_torque
+  control.inputs.motor_speed_rr = corner_rr.outputs.motor_speed
+  control.inputs.available_torque_rr = corner_rr.outputs.available_torque
   corner_fl.inputs.motor_demand = control.outputs.demand_fl
   corner_fr.inputs.motor_demand = control.outputs.demand_fr
   corner_rl.inputs.motor_demand = control.outputs.demand_rl

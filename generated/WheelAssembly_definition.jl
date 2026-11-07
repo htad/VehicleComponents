@@ -18,7 +18,7 @@
 
 ## Connectors
 
- * `outputs` - ([`WheelAssemblyOutputs`](@ref))
+ * `outputs` - ([`TireMF61Outputs`](@ref))
  * `spline` - This connector represents a rotational spline with angle and torque as the potential and flow variables, respectively. ([`Spline`](@ref))
  * `wheel_center` - Frame3D is the fundamental 3D connector used for 6DOF motion. Most components have one or several `Frame`
 connectors that can be connected together ([`Frame3D`](@ref))
@@ -89,7 +89,7 @@ connectors that can be connected together ([`Frame3D`](@ref))
   __constants = Any[]
 
   ### Components
-  push!(__systems, @named outputs = VehicleComponents.WheelAssemblyOutputs())
+  push!(__systems, @named outputs = VehicleComponents.TireMF61Outputs())
   push!(__systems, @named spline = __Dyad__Spline())
   push!(__systems, @named wheel_center = __Dyad__Frame3D())
   # Subcomponent tire of type VehicleComponents.TireMF61
@@ -439,13 +439,7 @@ connectors that can be connected together ([`Frame3D`](@ref))
   __assertions = []
 
   ### Equations
-  push!(__eqs, outputs.Fx ~ tire.outputs.Fx)
-  push!(__eqs, outputs.Fy ~ tire.outputs.Fy)
-  push!(__eqs, outputs.Fz ~ tire.outputs.Fz)
-  push!(__eqs, outputs.alpha ~ tire.outputs.alpha)
-  push!(__eqs, outputs.omega ~ tire.outputs.omega)
-  push!(__eqs, outputs.Re ~ tire.outputs.Re)
-  push!(__eqs, outputs.slip ~ tire.outputs.slip)
+  push!(__eqs, connect(outputs, tire.outputs))
   push!(__eqs, connect(wheel_center, tire.wheel_center))
   push!(__eqs, connect(wheel_center, wheel_body.frame_a))
   push!(__eqs, connect(spline, spin.spline_a))

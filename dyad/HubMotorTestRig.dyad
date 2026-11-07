@@ -1,0 +1,66 @@
+test component HubMotorTestRig
+  """A dynamometer sweeps the motor from 0 to 22,000 rpm with the housing fixed."""
+
+  world = MultibodyComponents.World(n = [0, 0, -1], render = false) {^world}
+  motor = VehicleComponents.HubMotor(
+    final motor_type = motor_type,
+    gear_ratio = gear_ratio
+  ) {^motor}
+  ground = RotationalComponents.Components.Fixed() {^ground}
+  drive = RotationalComponents.Sources.VelocitySource(
+    ref_type = RotationalComponents.Sources.ReferenceType.Exact()
+  ) {^drive}
+  
+  structural parameter motor_type::String = "AMK"
+
+  parameter gear_ratio::Real = 14
+  parameter demand::Real = 1
+  parameter sweep_duration::Time = 1
+  parameter final_motor_speed::AngularVelocity = 22000 * π / 30
+
+relations
+
+  motor.inputs.demand = demand
+  drive.w_ref = final_motor_speed * time / (sweep_duration * gear_ratio)
+
+  initial drive.phi = 0
+
+  connect(drive.spline, motor.spline) {^id5}
+  connect(drive.support, ground.spline) {^id6}
+  connect(world.frame_b, motor.wheel_center) {^id7}
+
+metadata {
+  "Dyad": {
+    "tests": {
+      "amk_full_load": {
+        "stop": 1,
+        "expect": {
+          "signals": [
+            "motor.outputs.motor_speed",
+            "motor.outputs.tau_motor",
+            "motor.outputs.tau_wheel",
+            "motor.outputs.shaft_power",
+            "motor.outputs.electrical_power"
+          ]
+        }
+      }
+    }
+  },
+  "_links": {
+    "world": {"Dyad": {"placement": {"diagram": {"x1": 0, "x2": 100, "y1": 0, "y2": 100}}}},
+    "motor": {"Dyad": {"placement": {"diagram": {"x1": 150, "x2": 250, "y1": 0, "y2": 100}}}},
+    "ground": {
+      "Dyad": {"placement": {"diagram": {"x1": 370, "x2": 470, "y1": 170, "y2": 270}}}
+    },
+    "drive": {"Dyad": {"placement": {"diagram": {"x1": 470, "x2": 370, "y1": 0, "y2": 100}}}},
+    "id5": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id6": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id7": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 125, "y": 50}, {"x": 125, "y": 49}], "E": 2}],
+        "path": {}
+      }
+    }
+  }
+}
+end

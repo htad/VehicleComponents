@@ -29,6 +29,10 @@ if selected_test in (nothing, "damper_maps.jl")
     include("damper_maps.jl")
 end
 
-if selected_test != "damper_maps.jl"
+if selected_test in (nothing, "hub_motor.jl")
+    include("hub_motor.jl")
+end
+
+if !(selected_test in ("damper_maps.jl", "hub_motor.jl"))
     include("../generated/tests.jl")
 end
