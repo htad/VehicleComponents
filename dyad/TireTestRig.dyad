@@ -27,15 +27,22 @@ test component TireTestRig
     eps_sigma = 0.001,
     damp_vlow = 0.001,
     road(N = 64, seed = 1, n_min = 0.02, n_max = 3.0, roughness = 0.0),
-    width = 0.235,
-    vertical_stiffness = 210000.0,
-    vertical_damping = 50.0,
+    WIDTH = 0.235,
+    VERTICAL_STIFFNESS = 210000.0,
+    VERTICAL_DAMPING = 50.0,
     FNOMIN = 4850.0,
     BREFF = 8.4,
     DREFF = 0.27,
     FREFF = 0.07,
-    longitudinal_stiffness = 358700.0,
-    lateral_stiffness = 144152.0,
+    LONGITUDINAL_STIFFNESS = 358700.0,
+    LATERAL_STIFFNESS = 144152.0,
+    PCFY1 = 0.0,
+    PCFY2 = 0.0,
+    PCFY3 = 0.0,
+    STRUCTURAL_LOAD_MIN = 0.0,
+    STRUCTURAL_LOAD_MAX = 1e12,
+    STRUCTURAL_PRESSURE_MIN = 0.0,
+    STRUCTURAL_PRESSURE_MAX = 1e12,
     INFLPRES = 200000.0,
     NOMPRES = 200000.0,
     LONGVL = 16.6,
@@ -164,7 +171,7 @@ test component TireTestRig
     LS = 1.0,
     LMUV = 0.0,
     is_left = true,
-    unloaded_radius = unloaded_radius
+    UNLOADED_RADIUS = unloaded_radius
   ) {^tire}
   
   # Mount. Sitting the mount low by `static_deflection` preloads the tyre at

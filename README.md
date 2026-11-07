@@ -40,6 +40,8 @@ vehicle = VehicleComponents.FullVehicle(
 
 Switch to `MR26.toml` or `MR27.toml` and regenerate. MR profiles are ignored by Git. Editing TOML values only requires a new model instance.
 
+All four wheels load `assets/TestTire.toml` by default. To use the Hoosier R20, change the tire’s `apply` line in `dyad/WheelAssembly.dyad` to `apply "dyad://VehicleComponents/R20.toml"`, regenerate, and construct a new model. This selects the tire for TestVehicle, MR26, and MR27. Wheel masses and inertias also belong to the vehicle.
+
 Select damper compression/extension CSVs independently, e.g. `heave_VC03_extension_07.csv`. Files use m/s and N; the loader converts published force signs. Source: Multimatic DSSV Valve Code Offerings, 2022-04-25.
 
 ## Dyad Conventions

@@ -27,7 +27,7 @@ parameter_map = Dict([
 ])
 
 prob = ODEProblem(ssys, parameter_map, (0.0, stop))
-vertical_stiffness = prob.ps[ssys.tire.vertical_stiffness]
+vertical_stiffness = prob.ps[ssys.tire.VERTICAL_STIFFNESS]
 sol = solve(prob, Rodas5P(autodiff=AutoFiniteDiff()))
 
 plot_slip_curve = Plots.plot(

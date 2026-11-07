@@ -23,21 +23,21 @@ component TireMF61
     color = sty_black,
     r = wheel_center.r_0,
     R = transpose(wheel_center.R),
-    r_shape = [0, -width / 2, 0],
+    r_shape = [0, -WIDTH / 2, 0],
     length_direction = [0, 1, 0],
     width_direction = [1, 0, 0],
-    length = width,
-    width = 2 * unloaded_radius,
-    height = 2 * unloaded_radius
+    length = WIDTH,
+    width = 2 * UNLOADED_RADIUS,
+    height = 2 * UNLOADED_RADIUS
   )
 
   # ---------------------------------------------------------------------------
   # TIR data - [DIMENSION] / [VERTICAL]
   # ---------------------------------------------------------------------------
-  parameter width::Length
-  parameter unloaded_radius::Length
-  parameter vertical_stiffness::TranslationalSpringConstant
-  parameter vertical_damping::TranslationalDampingConstant
+  parameter WIDTH::Length
+  parameter UNLOADED_RADIUS::Length
+  parameter VERTICAL_STIFFNESS::TranslationalSpringConstant
+  parameter VERTICAL_DAMPING::TranslationalDampingConstant
   parameter FNOMIN::Force
   parameter BREFF::Real
   parameter DREFF::Real
@@ -47,9 +47,19 @@ component TireMF61
   # TIR data - [STRUCTURAL]
   # ---------------------------------------------------------------------------
   "Tyre overall longitudinal stiffness. Sets the relaxation length."
-  parameter longitudinal_stiffness::TranslationalSpringConstant
-  "Tyre overall lateral stiffness. Sets the lateral relaxation length."
-  parameter lateral_stiffness::TranslationalSpringConstant
+  parameter LONGITUDINAL_STIFFNESS::TranslationalSpringConstant
+  "Overall lateral stiffness at nominal load and inflation pressure."
+  parameter LATERAL_STIFFNESS::TranslationalSpringConstant
+  "Linear load term in lateral stiffness."
+  parameter PCFY1::Real
+  "Quadratic load term in lateral stiffness."
+  parameter PCFY2::Real
+  "Linear pressure term in lateral stiffness."
+  parameter PCFY3::Real
+  parameter STRUCTURAL_LOAD_MIN::Force
+  parameter STRUCTURAL_LOAD_MAX::Force
+  parameter STRUCTURAL_PRESSURE_MIN::Pressure
+  parameter STRUCTURAL_PRESSURE_MAX::Pressure
 
   # ---------------------------------------------------------------------------
   # TIR data - [OPERATING_CONDITIONS]
@@ -334,10 +344,13 @@ component TireMF61
   # Derived configuration - fixed during a simulation
   # ---------------------------------------------------------------------------
   "Tyre deflection at the nominal load (Pacejka eq. 9.230)"
-  final parameter rho_Fz0::Length = FNOMIN / vertical_stiffness
-  # 4.E1 and 4.E2b
+  final parameter rho_Fz0::Length = FNOMIN / VERTICAL_STIFFNESS
+  # 4.E1
   final parameter Fz0_prime::Force = LFZO * FNOMIN
+  # 4.E2b
   final parameter dpi::Real = (INFLPRES - NOMPRES) / NOMPRES
+  # 4.E2b with inflation pressure limited to the structural fit range.
+  final parameter structural_dpi::Real = (min(max(INFLPRES, STRUCTURAL_PRESSURE_MIN), STRUCTURAL_PRESSURE_MAX) - NOMPRES) / NOMPRES
   # Pure-slip shape factors (4.E11 and 4.E21)
   final parameter Cx::Real = PCX1 * LCX
   final parameter Cy::Real = PCY1 * LCY
@@ -428,7 +441,11 @@ component TireMF61
   variable alpha_sl::Real
   "Transient lateral slip tan(alpha') (7.26). What the Magic Formula is fed."
   variable alpha_prime::Real
-  "Lateral relaxation length (7.12)"
+  "Fractional load change from FNOMIN after limiting Fz to the structural fit range (4.E2a)."
+  variable structural_dfz::Real
+  "Lateral structural stiffness at the bounded load and pressure, in N/m (Besselink et al., Eq. 18)."
+  variable cy::TranslationalSpringConstant
+  "Lateral relaxation length (7.6)"
   variable sigma_alpha::Length
 
   # ---------------------------------------------------------------------------
@@ -494,7 +511,16 @@ component TireMF61
   variable SVyk::Force
   "Combined-slip lateral force (4.E58)"
   variable Fy::Force
-  "Lateral force without the kappa-induced shift (4.E74), what the trail acts on"
+  variable Dy_trail::Force
+  variable Kya_trail::Force
+  variable By_trail::Real
+  variable ay_trail::Real
+  variable Ey_trail_raw::Real
+  variable Ey_trail::Real
+  variable Fy0_trail::Force
+  variable Byk_trail::Real
+  variable Gyk_trail::Real
+  "Zero-camber lateral force in the trail contribution (4.E74)"
   variable Fy_prime::Force
 
   # ---------------------------------------------------------------------------
@@ -559,16 +585,16 @@ relations
   # ===========================================================================
   z_w = wheel_center.r_0[3] - road.outputs.z
   v_z = der(z_w)
-  z_bottom = z_w - unloaded_radius
+  z_bottom = z_w - UNLOADED_RADIUS
   rho = ifelse(z_bottom < 0, -z_bottom, 0)
-  loaded_radius = unloaded_radius - rho
+  loaded_radius = UNLOADED_RADIUS - rho
 
   # Contact force
-  Fz_raw = vertical_stiffness * rho - vertical_damping * v_z
+  Fz_raw = VERTICAL_STIFFNESS * rho - VERTICAL_DAMPING * v_z
   Fz = ifelse(rho > 0, ifelse(Fz_raw > 0, Fz_raw, 0), 0)
 
   # Effective rolling radius (Pacejka eq. 9.230)
-  Re = unloaded_radius - rho_Fz0 * (DREFF * atan(BREFF * (rho / rho_Fz0)) + FREFF * (rho / rho_Fz0))
+  Re = UNLOADED_RADIUS - rho_Fz0 * (DREFF * atan(BREFF * (rho / rho_Fz0)) + FREFF * (rho / rho_Fz0))
 
   # ===========================================================================
   # Contact frame
@@ -597,7 +623,7 @@ relations
   # ===========================================================================
   omega = der(spline.phi)
   V_sx = V_x - omega * Re
-  V_s = abs(V_sx)
+  V_s = sqrt(V_sx ^ 2 + V_y_mf ^ 2)
 
   # 4.E5
   kappa = -V_sx / ifelse(abs(V_x) > eps_v, abs(V_x), eps_v)
@@ -662,7 +688,7 @@ relations
   SHx = (PHX1 + PHX2 * dfz) * LHX * lam_low
 
   # 7.8, sigma_kappa = CFkappa / CFx
-  sigma_kappa = max(Kxk / longitudinal_stiffness, eps_sigma)
+  sigma_kappa = max(Kxk / LONGITUDINAL_STIFFNESS, eps_sigma)
 
   # 7.9, du/dt + |Vx|u/sigma_kappa = -Vsx
   u_dot_free = -V_sx - abs(V_x) * u_x / sigma_kappa
@@ -670,11 +696,7 @@ relations
   # 7.26, Besselink low-speed damping (replacing 7.15)
   kappa_prime = (u_x - damp_vlow * (1 - lam_low) * V_sx) / sigma_kappa
 
-  # 7.25. One condition gates both deflections: the equivalent slip angle of
-  # (4.E78) against alpha_sl = 3*Dy/CFalpha, and only below Vlow. The book
-  # writes "alpha_r',eq > alpha_sl"; taken as a magnitude here, since alpha_r_eq
-  # carries sgn(alpha_r) and a limiter that arms on only one side of zero cannot
-  # be what is meant.
+  # 7.25 compares the magnitude of the equivalent slip angle to alpha_sl.
   alpha_sl = 3 * abs(Dy) / max(abs(Kya), eps_k)
   der(u_x) = ifelse(abs(alpha_r_eq) > alpha_sl,
                ifelse(abs(V_x) < eps_v,
@@ -721,9 +743,12 @@ relations
   # 4.E26. The guard carries the sign of Dy, which PAC2002 fits make negative.
   By = Kya / (Cy * Dy + ifelse(Dy >= 0, eps_y, -eps_y))
 
-  # 7.6, sigma_alpha = CFalpha / CFy. abs() because Kya < 0 in this data set,
-  # which is the same sign convention issue flagged at alpha above.
-  sigma_alpha = max(abs(Kya) / lateral_stiffness, eps_sigma)
+  # 4.E2a using FNOMIN as the reference and limiting load to the structural fit range.
+  structural_dfz = (min(max(Fz, STRUCTURAL_LOAD_MIN), STRUCTURAL_LOAD_MAX) - FNOMIN) / FNOMIN
+  # Besselink et al. (2010), Eq. 18.
+  cy = LATERAL_STIFFNESS * (1 + PCFY1 * structural_dfz + PCFY2 * structural_dfz ^ 2) * (1 + PCFY3 * structural_dpi)
+  # 7.6 and Besselink et al. (2010), Eq. 20. Kya is negative for this tire.
+  sigma_alpha = max(abs(Kya) / cy, eps_sigma)
 
   # 7.7, dv/dt + |Vx|v/sigma_alpha = -Vsy. The sign of the forcing term is
   # flipped from the book to match the flipped alpha, so the steady state is
@@ -733,11 +758,11 @@ relations
   # 7.26, which the book says may equally be used for the lateral
   alpha_prime = (v_y + damp_vlow * (1 - lam_low) * V_y_mf) / sigma_alpha
 
-  # 7.25, same gate as the longitudinal deflection above. The book uses Vx here
-  # rather than the |Vx| it uses in the longitudinal branch; kept as written.
+  # 7.25, growth limiter after converting to the signed local lateral state.
+  # The printed equation uses |Vx| in both state tests.
   der(v_y) = ifelse(abs(alpha_r_eq) > alpha_sl,
                ifelse(abs(V_x) < eps_v,
-                 ifelse((-V_y_mf + V_x * v_y / sigma_alpha) * v_y < 0, 0, v_dot_free),
+                 ifelse((-V_y_mf + abs(V_x) * v_y / sigma_alpha) * v_y < 0, 0, v_dot_free),
                  v_dot_free),
                v_dot_free)
 
@@ -813,8 +838,27 @@ relations
   # 4.E58
   Fy = Gyk * Fy0 + SVyk
 
+  # 4.E22 and 4.E23 at zero camber and turn slip, as required by 4.E74.
+  Dy_trail = Fz * (PDY1 + PDY2 * dfz) * (1 + PPY3 * dpi + PPY4 * dpi ^ 2) * lam_muy_star
+  # 4.E25 at zero camber and turn slip.
+  Kya_trail = PKY1 * Fz0_prime * (1 + PPY1 * dpi) * sin(PKY4 * atan((Fz / Fz0_prime) / (PKY2 * (1 + PPY2 * dpi)))) * LKY
+  # 4.E26 with the same signed denominator guard as By.
+  By_trail = Kya_trail / (Cy * Dy_trail + ifelse(Dy_trail >= 0, eps_y, -eps_y))
+  # 4.E20 and 4.E27 at zero camber, using transient slip and the low-speed shift fade.
+  ay_trail = alpha_prime + (PHY1 + PHY2 * dfz) * LHY * lam_low
+  # 4.E24 at zero camber.
+  Ey_trail_raw = (PEY1 + PEY2 * dfz) * (1 - PEY3 * ifelse(ay_trail >= 0, 1, -1)) * LEY
+  # 4.E24 upper bound on curvature.
+  Ey_trail = min(1, Ey_trail_raw)
+  # 4.E19 with the zero-camber vertical shift from 4.E29 and the low-speed shift fade.
+  Fy0_trail = Dy_trail * sin(Cy * atan(By_trail * ay_trail - Ey_trail * (By_trail * ay_trail - atan(By_trail * ay_trail)))) + Fz * (PVY1 + PVY2 * dfz) * lam_muy_prime * LVY * lam_low
+  # 4.E62 at zero camber.
+  Byk_trail = RBY1 * cos(atan(RBY2 * (alpha_prime - RBY3))) * LYKA
+  # 4.E59 normalized by 4.E60, both at zero camber.
+  Gyk_trail = cos(Cyk * atan(Byk_trail * kappa_s - Eyk * (Byk_trail * kappa_s - atan(Byk_trail * kappa_s)))) / cos(Cyk * atan(Byk_trail * SHyk - Eyk * (Byk_trail * SHyk - atan(Byk_trail * SHyk))))
+
   # 4.E74
-  Fy_prime = Gyk * Fy0
+  Fy_prime = Gyk_trail * Fy0_trail
 
   # ===========================================================================
   # Aligning moment
@@ -831,7 +875,7 @@ relations
   Bt = (QBZ1 + QBZ2 * dfz + QBZ3 * dfz ^ 2) * (1 + QBZ5 * abs(gamma_star) + QBZ6 * gamma_star ^ 2) * (LKY / lam_muy_star)
 
   # 4.E42
-  Dt0 = Fz * (unloaded_radius / Fz0_prime) * (QDZ1 + QDZ2 * dfz) * (1 - PPZ1 * dpi) * LTR * sgn_Vx
+  Dt0 = Fz * (UNLOADED_RADIUS / Fz0_prime) * (QDZ1 + QDZ2 * dfz) * (1 - PPZ1 * dpi) * LTR * sgn_Vx
 
   # 4.E43 (zeta5 = 1)
   Dt = Dt0 * (1 + QDZ3 * abs(gamma_star) + QDZ4 * gamma_star ^ 2)
@@ -850,7 +894,7 @@ relations
   Br = QBZ9 * LKY / lam_muy_star + QBZ10 * By * Cy
 
   # 4.E47 (zeta0 = zeta2 = 1, and the trailing zeta8 - 1 vanishes)
-  Dr = Fz * unloaded_radius * ((QDZ6 + QDZ7 * dfz) * LRES + ((QDZ8 + QDZ9 * dfz) * (1 + PPZ2 * dpi) + (QDZ10 + QDZ11 * dfz) * abs(gamma_star)) * gamma_star * LKZC) * lam_muy_star * sgn_Vx * cos_alpha
+  Dr = Fz * UNLOADED_RADIUS * ((QDZ6 + QDZ7 * dfz) * LRES + ((QDZ8 + QDZ9 * dfz) * (1 + PPZ2 * dpi) + (QDZ10 + QDZ11 * dfz) * abs(gamma_star)) * gamma_star * LKZC) * lam_muy_star * sgn_Vx * cos_alpha
 
   # 4.E77
   alpha_t_eq = sqrt(alpha_t ^ 2 + (Kxk / Kya_prime) ^ 2 * kappa_prime ^ 2) * ifelse(alpha_t >= 0, 1, -1)
@@ -868,7 +912,7 @@ relations
   Mzr = Dr * cos(Cr * atan(Br * alpha_r_eq)) * cos_alpha
 
   # 4.E76
-  s_arm = unloaded_radius * (SSZ1 + SSZ2 * (Fy / Fz0_prime) + (SSZ3 + SSZ4 * dfz) * gamma_star) * LS
+  s_arm = UNLOADED_RADIUS * (SSZ1 + SSZ2 * (Fy / Fz0_prime) + (SSZ3 + SSZ4 * dfz) * gamma_star) * LS
 
   # 4.E71
   Mz = Mz_prime + Mzr + s_arm * Fx
@@ -974,21 +1018,28 @@ metadata {
       "children": {
         "Geometry": {
           "contents": [
-            "width",
-            "unloaded_radius",
+            "WIDTH",
+            "UNLOADED_RADIUS",
             "is_left"
           ]
         },
         "Vertical and relaxation": {
           "contents": [
-            "vertical_stiffness",
-            "vertical_damping",
+            "VERTICAL_STIFFNESS",
+            "VERTICAL_DAMPING",
             "FNOMIN",
             "BREFF",
             "DREFF",
             "FREFF",
-            "longitudinal_stiffness",
-            "lateral_stiffness"
+            "LONGITUDINAL_STIFFNESS",
+            "LATERAL_STIFFNESS",
+            "PCFY1",
+            "PCFY2",
+            "PCFY3",
+            "STRUCTURAL_LOAD_MIN",
+            "STRUCTURAL_LOAD_MAX",
+            "STRUCTURAL_PRESSURE_MIN",
+            "STRUCTURAL_PRESSURE_MAX"
           ]
         },
         "Operating conditions": {

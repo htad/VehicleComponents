@@ -5,23 +5,30 @@
 
 
 @doc Markdown.doc"""
-   TireMF61(; name, is_left, width, unloaded_radius, vertical_stiffness, vertical_damping, FNOMIN, BREFF, DREFF, FREFF, longitudinal_stiffness, lateral_stiffness, INFLPRES, NOMPRES, LONGVL, PCX1, PDX1, PDX2, PDX3, PEX1, PEX2, PEX3, PEX4, PKX1, PKX2, PKX3, PHX1, PHX2, PVX1, PVX2, PPX1, PPX2, PPX3, PPX4, RBX1, RBX2, RBX3, RCX1, REX1, REX2, RHX1, PCY1, PDY1, PDY2, PDY3, PEY1, PEY2, PEY3, PEY4, PEY5, PKY1, PKY2, PKY3, PKY4, PKY5, PKY6, PKY7, PHY1, PHY2, PVY1, PVY2, PVY3, PVY4, PPY1, PPY2, PPY3, PPY4, PPY5, RBY1, RBY2, RBY3, RBY4, RCY1, REY1, REY2, RHY1, RHY2, RVY1, RVY2, RVY3, RVY4, RVY5, RVY6, QBZ1, QBZ2, QBZ3, QBZ4, QBZ5, QBZ6, QBZ9, QBZ10, QCZ1, QDZ1, QDZ2, QDZ3, QDZ4, QDZ6, QDZ7, QDZ8, QDZ9, QDZ10, QDZ11, QEZ1, QEZ2, QEZ3, QEZ4, QEZ5, QHZ1, QHZ2, QHZ3, QHZ4, PPZ1, PPZ2, SSZ1, SSZ2, SSZ3, SSZ4, LFZO, LCX, LMUX, LEX, LKX, LHX, LVX, LCY, LMUY, LEY, LKY, LHY, LVY, LKYC, LXAL, LYKA, LVYKA, LTR, LRES, LKZC, LS, LMUV, Au, eps_x, eps_y, eps_k, eps_gamma, eps_v, eps_vc, eps_sigma, damp_vlow, __overrides)
+   TireMF61(; name, is_left, WIDTH, UNLOADED_RADIUS, VERTICAL_STIFFNESS, VERTICAL_DAMPING, FNOMIN, BREFF, DREFF, FREFF, LONGITUDINAL_STIFFNESS, LATERAL_STIFFNESS, PCFY1, PCFY2, PCFY3, STRUCTURAL_LOAD_MIN, STRUCTURAL_LOAD_MAX, STRUCTURAL_PRESSURE_MIN, STRUCTURAL_PRESSURE_MAX, INFLPRES, NOMPRES, LONGVL, PCX1, PDX1, PDX2, PDX3, PEX1, PEX2, PEX3, PEX4, PKX1, PKX2, PKX3, PHX1, PHX2, PVX1, PVX2, PPX1, PPX2, PPX3, PPX4, RBX1, RBX2, RBX3, RCX1, REX1, REX2, RHX1, PCY1, PDY1, PDY2, PDY3, PEY1, PEY2, PEY3, PEY4, PEY5, PKY1, PKY2, PKY3, PKY4, PKY5, PKY6, PKY7, PHY1, PHY2, PVY1, PVY2, PVY3, PVY4, PPY1, PPY2, PPY3, PPY4, PPY5, RBY1, RBY2, RBY3, RBY4, RCY1, REY1, REY2, RHY1, RHY2, RVY1, RVY2, RVY3, RVY4, RVY5, RVY6, QBZ1, QBZ2, QBZ3, QBZ4, QBZ5, QBZ6, QBZ9, QBZ10, QCZ1, QDZ1, QDZ2, QDZ3, QDZ4, QDZ6, QDZ7, QDZ8, QDZ9, QDZ10, QDZ11, QEZ1, QEZ2, QEZ3, QEZ4, QEZ5, QHZ1, QHZ2, QHZ3, QHZ4, PPZ1, PPZ2, SSZ1, SSZ2, SSZ3, SSZ4, LFZO, LCX, LMUX, LEX, LKX, LHX, LVX, LCY, LMUY, LEY, LKY, LHY, LVY, LKYC, LXAL, LYKA, LVYKA, LTR, LRES, LKZC, LS, LMUV, Au, eps_x, eps_y, eps_k, eps_gamma, eps_v, eps_vc, eps_sigma, damp_vlow, __overrides)
 
 ## Parameters:
 
 | Name         | Description                         | Units  |   Default value |
 | ------------ | ----------------------------------- | ------ | --------------- |
 | `is_left`         |                          | --  |    |
-| `width`         |                          | m  |    |
-| `unloaded_radius`         |                          | m  |    |
-| `vertical_stiffness`         |                          | N/m  |    |
-| `vertical_damping`         |                          | N.s/m  |    |
+| `WIDTH`         |                          | m  |    |
+| `UNLOADED_RADIUS`         |                          | m  |    |
+| `VERTICAL_STIFFNESS`         |                          | N/m  |    |
+| `VERTICAL_DAMPING`         |                          | N.s/m  |    |
 | `FNOMIN`         |                          | N  |    |
 | `BREFF`         |                          | --  |    |
 | `DREFF`         |                          | --  |    |
 | `FREFF`         |                          | --  |    |
-| `longitudinal_stiffness`         | Tyre overall longitudinal stiffness. Sets the relaxation length.                         | N/m  |    |
-| `lateral_stiffness`         | Tyre overall lateral stiffness. Sets the lateral relaxation length.                         | N/m  |    |
+| `LONGITUDINAL_STIFFNESS`         | Tyre overall longitudinal stiffness. Sets the relaxation length.                         | N/m  |    |
+| `LATERAL_STIFFNESS`         | Overall lateral stiffness at nominal load and inflation pressure.                         | N/m  |    |
+| `PCFY1`         | Linear load term in lateral stiffness.                         | --  |    |
+| `PCFY2`         | Quadratic load term in lateral stiffness.                         | --  |    |
+| `PCFY3`         | Linear pressure term in lateral stiffness.                         | --  |    |
+| `STRUCTURAL_LOAD_MIN`         |                          | N  |    |
+| `STRUCTURAL_LOAD_MAX`         |                          | N  |    |
+| `STRUCTURAL_PRESSURE_MIN`         |                          | Pa  |    |
+| `STRUCTURAL_PRESSURE_MAX`         |                          | Pa  |    |
 | `INFLPRES`         |                          | Pa  |    |
 | `NOMPRES`         |                          | Pa  |    |
 | `LONGVL`         |                          | m/s  |    |
@@ -202,7 +209,9 @@ connectors that can be connected together ([`Frame3D`](@ref))
 | `v_dot_free`         | Unlimited right-hand side of (7.11), before the (7.25) deflection limiter                         | m/s  |
 | `alpha_sl`         | Equivalent slip angle at which the (7.25) limiter arms, 3*Dy/CFalpha                         | --  |
 | `alpha_prime`         | Transient lateral slip tan(alpha') (7.26). What the Magic Formula is fed.                         | --  |
-| `sigma_alpha`         | Lateral relaxation length (7.12)                         | m  |
+| `structural_dfz`         | Fractional load change from FNOMIN after limiting Fz to the structural fit range (4.E2a).                         | --  |
+| `cy`         | Lateral structural stiffness at the bounded load and pressure, in N/m (Besselink et al., Eq. 18).                         | N/m  |
+| `sigma_alpha`         | Lateral relaxation length (7.6)                         | m  |
 | `dfz`         |                          | --  |
 | `gamma_star`         |                          | --  |
 | `lam_mux_star`         |                          | --  |
@@ -251,7 +260,16 @@ connectors that can be connected together ([`Frame3D`](@ref))
 | `Dvyk`         |                          | N  |
 | `SVyk`         |                          | N  |
 | `Fy`         | Combined-slip lateral force (4.E58)                         | N  |
-| `Fy_prime`         | Lateral force without the kappa-induced shift (4.E74), what the trail acts on                         | N  |
+| `Dy_trail`         |                          | N  |
+| `Kya_trail`         |                          | N  |
+| `By_trail`         |                          | --  |
+| `ay_trail`         |                          | --  |
+| `Ey_trail_raw`         |                          | --  |
+| `Ey_trail`         |                          | --  |
+| `Fy0_trail`         |                          | N  |
+| `Byk_trail`         |                          | --  |
+| `Gyk_trail`         |                          | --  |
+| `Fy_prime`         | Zero-camber lateral force in the trail contribution (4.E74)                         | N  |
 | `SHt`         |                          | --  |
 | `alpha_t`         |                          | --  |
 | `Bt`         |                          | --  |
@@ -278,7 +296,7 @@ connectors that can be connected together ([`Frame3D`](@ref))
 | `tau_wy`         |                          | N.m  |
 | `tau_wz`         |                          | N.m  |
 """
-@component function TireMF61(; name = nothing, var"is_left"=nothing, var"width"=nothing, var"unloaded_radius"=nothing, var"vertical_stiffness"=nothing, var"vertical_damping"=nothing, var"FNOMIN"=nothing, var"BREFF"=nothing, var"DREFF"=nothing, var"FREFF"=nothing, var"longitudinal_stiffness"=nothing, var"lateral_stiffness"=nothing, var"INFLPRES"=nothing, var"NOMPRES"=nothing, var"LONGVL"=nothing, var"PCX1"=nothing, var"PDX1"=nothing, var"PDX2"=nothing, var"PDX3"=nothing, var"PEX1"=nothing, var"PEX2"=nothing, var"PEX3"=nothing, var"PEX4"=nothing, var"PKX1"=nothing, var"PKX2"=nothing, var"PKX3"=nothing, var"PHX1"=nothing, var"PHX2"=nothing, var"PVX1"=nothing, var"PVX2"=nothing, var"PPX1"=nothing, var"PPX2"=nothing, var"PPX3"=nothing, var"PPX4"=nothing, var"RBX1"=nothing, var"RBX2"=nothing, var"RBX3"=nothing, var"RCX1"=nothing, var"REX1"=nothing, var"REX2"=nothing, var"RHX1"=nothing, var"PCY1"=nothing, var"PDY1"=nothing, var"PDY2"=nothing, var"PDY3"=nothing, var"PEY1"=nothing, var"PEY2"=nothing, var"PEY3"=nothing, var"PEY4"=nothing, var"PEY5"=nothing, var"PKY1"=nothing, var"PKY2"=nothing, var"PKY3"=nothing, var"PKY4"=nothing, var"PKY5"=nothing, var"PKY6"=nothing, var"PKY7"=nothing, var"PHY1"=nothing, var"PHY2"=nothing, var"PVY1"=nothing, var"PVY2"=nothing, var"PVY3"=nothing, var"PVY4"=nothing, var"PPY1"=nothing, var"PPY2"=nothing, var"PPY3"=nothing, var"PPY4"=nothing, var"PPY5"=nothing, var"RBY1"=nothing, var"RBY2"=nothing, var"RBY3"=nothing, var"RBY4"=nothing, var"RCY1"=nothing, var"REY1"=nothing, var"REY2"=nothing, var"RHY1"=nothing, var"RHY2"=nothing, var"RVY1"=nothing, var"RVY2"=nothing, var"RVY3"=nothing, var"RVY4"=nothing, var"RVY5"=nothing, var"RVY6"=nothing, var"QBZ1"=nothing, var"QBZ2"=nothing, var"QBZ3"=nothing, var"QBZ4"=nothing, var"QBZ5"=nothing, var"QBZ6"=nothing, var"QBZ9"=nothing, var"QBZ10"=nothing, var"QCZ1"=nothing, var"QDZ1"=nothing, var"QDZ2"=nothing, var"QDZ3"=nothing, var"QDZ4"=nothing, var"QDZ6"=nothing, var"QDZ7"=nothing, var"QDZ8"=nothing, var"QDZ9"=nothing, var"QDZ10"=nothing, var"QDZ11"=nothing, var"QEZ1"=nothing, var"QEZ2"=nothing, var"QEZ3"=nothing, var"QEZ4"=nothing, var"QEZ5"=nothing, var"QHZ1"=nothing, var"QHZ2"=nothing, var"QHZ3"=nothing, var"QHZ4"=nothing, var"PPZ1"=nothing, var"PPZ2"=nothing, var"SSZ1"=nothing, var"SSZ2"=nothing, var"SSZ3"=nothing, var"SSZ4"=nothing, var"LFZO"=nothing, var"LCX"=nothing, var"LMUX"=nothing, var"LEX"=nothing, var"LKX"=nothing, var"LHX"=nothing, var"LVX"=nothing, var"LCY"=nothing, var"LMUY"=nothing, var"LEY"=nothing, var"LKY"=nothing, var"LHY"=nothing, var"LVY"=nothing, var"LKYC"=nothing, var"LXAL"=nothing, var"LYKA"=nothing, var"LVYKA"=nothing, var"LTR"=nothing, var"LRES"=nothing, var"LKZC"=nothing, var"LS"=nothing, var"LMUV"=nothing, var"Au"=nothing, var"eps_x"=nothing, var"eps_y"=nothing, var"eps_k"=nothing, var"eps_gamma"=nothing, var"eps_v"=nothing, var"eps_vc"=nothing, var"eps_sigma"=nothing, var"damp_vlow"=nothing, __overrides = Dict{String, Any}())
+@component function TireMF61(; name = nothing, var"is_left"=nothing, var"WIDTH"=nothing, var"UNLOADED_RADIUS"=nothing, var"VERTICAL_STIFFNESS"=nothing, var"VERTICAL_DAMPING"=nothing, var"FNOMIN"=nothing, var"BREFF"=nothing, var"DREFF"=nothing, var"FREFF"=nothing, var"LONGITUDINAL_STIFFNESS"=nothing, var"LATERAL_STIFFNESS"=nothing, var"PCFY1"=nothing, var"PCFY2"=nothing, var"PCFY3"=nothing, var"STRUCTURAL_LOAD_MIN"=nothing, var"STRUCTURAL_LOAD_MAX"=nothing, var"STRUCTURAL_PRESSURE_MIN"=nothing, var"STRUCTURAL_PRESSURE_MAX"=nothing, var"INFLPRES"=nothing, var"NOMPRES"=nothing, var"LONGVL"=nothing, var"PCX1"=nothing, var"PDX1"=nothing, var"PDX2"=nothing, var"PDX3"=nothing, var"PEX1"=nothing, var"PEX2"=nothing, var"PEX3"=nothing, var"PEX4"=nothing, var"PKX1"=nothing, var"PKX2"=nothing, var"PKX3"=nothing, var"PHX1"=nothing, var"PHX2"=nothing, var"PVX1"=nothing, var"PVX2"=nothing, var"PPX1"=nothing, var"PPX2"=nothing, var"PPX3"=nothing, var"PPX4"=nothing, var"RBX1"=nothing, var"RBX2"=nothing, var"RBX3"=nothing, var"RCX1"=nothing, var"REX1"=nothing, var"REX2"=nothing, var"RHX1"=nothing, var"PCY1"=nothing, var"PDY1"=nothing, var"PDY2"=nothing, var"PDY3"=nothing, var"PEY1"=nothing, var"PEY2"=nothing, var"PEY3"=nothing, var"PEY4"=nothing, var"PEY5"=nothing, var"PKY1"=nothing, var"PKY2"=nothing, var"PKY3"=nothing, var"PKY4"=nothing, var"PKY5"=nothing, var"PKY6"=nothing, var"PKY7"=nothing, var"PHY1"=nothing, var"PHY2"=nothing, var"PVY1"=nothing, var"PVY2"=nothing, var"PVY3"=nothing, var"PVY4"=nothing, var"PPY1"=nothing, var"PPY2"=nothing, var"PPY3"=nothing, var"PPY4"=nothing, var"PPY5"=nothing, var"RBY1"=nothing, var"RBY2"=nothing, var"RBY3"=nothing, var"RBY4"=nothing, var"RCY1"=nothing, var"REY1"=nothing, var"REY2"=nothing, var"RHY1"=nothing, var"RHY2"=nothing, var"RVY1"=nothing, var"RVY2"=nothing, var"RVY3"=nothing, var"RVY4"=nothing, var"RVY5"=nothing, var"RVY6"=nothing, var"QBZ1"=nothing, var"QBZ2"=nothing, var"QBZ3"=nothing, var"QBZ4"=nothing, var"QBZ5"=nothing, var"QBZ6"=nothing, var"QBZ9"=nothing, var"QBZ10"=nothing, var"QCZ1"=nothing, var"QDZ1"=nothing, var"QDZ2"=nothing, var"QDZ3"=nothing, var"QDZ4"=nothing, var"QDZ6"=nothing, var"QDZ7"=nothing, var"QDZ8"=nothing, var"QDZ9"=nothing, var"QDZ10"=nothing, var"QDZ11"=nothing, var"QEZ1"=nothing, var"QEZ2"=nothing, var"QEZ3"=nothing, var"QEZ4"=nothing, var"QEZ5"=nothing, var"QHZ1"=nothing, var"QHZ2"=nothing, var"QHZ3"=nothing, var"QHZ4"=nothing, var"PPZ1"=nothing, var"PPZ2"=nothing, var"SSZ1"=nothing, var"SSZ2"=nothing, var"SSZ3"=nothing, var"SSZ4"=nothing, var"LFZO"=nothing, var"LCX"=nothing, var"LMUX"=nothing, var"LEX"=nothing, var"LKX"=nothing, var"LHX"=nothing, var"LVX"=nothing, var"LCY"=nothing, var"LMUY"=nothing, var"LEY"=nothing, var"LKY"=nothing, var"LHY"=nothing, var"LVY"=nothing, var"LKYC"=nothing, var"LXAL"=nothing, var"LYKA"=nothing, var"LVYKA"=nothing, var"LTR"=nothing, var"LRES"=nothing, var"LKZC"=nothing, var"LS"=nothing, var"LMUV"=nothing, var"Au"=nothing, var"eps_x"=nothing, var"eps_y"=nothing, var"eps_k"=nothing, var"eps_gamma"=nothing, var"eps_v"=nothing, var"eps_vc"=nothing, var"eps_sigma"=nothing, var"damp_vlow"=nothing, __overrides = Dict{String, Any}())
   isnothing(name) && throw(ArgumentError("""
     The `name` keyword must be provided. Please consider using the `@named` macro,
     like so:
@@ -298,16 +316,23 @@ connectors that can be connected together ([`Frame3D`](@ref))
 
   ### Keyword argument overrides
   haskey(__overrides, "is_left") && (is_left = pop!(__overrides, "is_left"))
-  haskey(__overrides, "width") && (width = pop!(__overrides, "width"))
-  haskey(__overrides, "unloaded_radius") && (unloaded_radius = pop!(__overrides, "unloaded_radius"))
-  haskey(__overrides, "vertical_stiffness") && (vertical_stiffness = pop!(__overrides, "vertical_stiffness"))
-  haskey(__overrides, "vertical_damping") && (vertical_damping = pop!(__overrides, "vertical_damping"))
+  haskey(__overrides, "WIDTH") && (WIDTH = pop!(__overrides, "WIDTH"))
+  haskey(__overrides, "UNLOADED_RADIUS") && (UNLOADED_RADIUS = pop!(__overrides, "UNLOADED_RADIUS"))
+  haskey(__overrides, "VERTICAL_STIFFNESS") && (VERTICAL_STIFFNESS = pop!(__overrides, "VERTICAL_STIFFNESS"))
+  haskey(__overrides, "VERTICAL_DAMPING") && (VERTICAL_DAMPING = pop!(__overrides, "VERTICAL_DAMPING"))
   haskey(__overrides, "FNOMIN") && (FNOMIN = pop!(__overrides, "FNOMIN"))
   haskey(__overrides, "BREFF") && (BREFF = pop!(__overrides, "BREFF"))
   haskey(__overrides, "DREFF") && (DREFF = pop!(__overrides, "DREFF"))
   haskey(__overrides, "FREFF") && (FREFF = pop!(__overrides, "FREFF"))
-  haskey(__overrides, "longitudinal_stiffness") && (longitudinal_stiffness = pop!(__overrides, "longitudinal_stiffness"))
-  haskey(__overrides, "lateral_stiffness") && (lateral_stiffness = pop!(__overrides, "lateral_stiffness"))
+  haskey(__overrides, "LONGITUDINAL_STIFFNESS") && (LONGITUDINAL_STIFFNESS = pop!(__overrides, "LONGITUDINAL_STIFFNESS"))
+  haskey(__overrides, "LATERAL_STIFFNESS") && (LATERAL_STIFFNESS = pop!(__overrides, "LATERAL_STIFFNESS"))
+  haskey(__overrides, "PCFY1") && (PCFY1 = pop!(__overrides, "PCFY1"))
+  haskey(__overrides, "PCFY2") && (PCFY2 = pop!(__overrides, "PCFY2"))
+  haskey(__overrides, "PCFY3") && (PCFY3 = pop!(__overrides, "PCFY3"))
+  haskey(__overrides, "STRUCTURAL_LOAD_MIN") && (STRUCTURAL_LOAD_MIN = pop!(__overrides, "STRUCTURAL_LOAD_MIN"))
+  haskey(__overrides, "STRUCTURAL_LOAD_MAX") && (STRUCTURAL_LOAD_MAX = pop!(__overrides, "STRUCTURAL_LOAD_MAX"))
+  haskey(__overrides, "STRUCTURAL_PRESSURE_MIN") && (STRUCTURAL_PRESSURE_MIN = pop!(__overrides, "STRUCTURAL_PRESSURE_MIN"))
+  haskey(__overrides, "STRUCTURAL_PRESSURE_MAX") && (STRUCTURAL_PRESSURE_MAX = pop!(__overrides, "STRUCTURAL_PRESSURE_MAX"))
   haskey(__overrides, "INFLPRES") && (INFLPRES = pop!(__overrides, "INFLPRES"))
   haskey(__overrides, "NOMPRES") && (NOMPRES = pop!(__overrides, "NOMPRES"))
   haskey(__overrides, "LONGVL") && (LONGVL = pop!(__overrides, "LONGVL"))
@@ -470,6 +495,7 @@ connectors that can be connected together ([`Frame3D`](@ref))
   append!(__params, @parameters (rho_Fz0::Real), [description = "Tyre deflection at the nominal load (Pacejka eq. 9.230)", misc = "final"])
   append!(__params, @parameters (Fz0_prime::Real), [misc = "final"])
   append!(__params, @parameters (dpi::Real), [misc = "final"])
+  append!(__params, @parameters (structural_dpi::Real), [misc = "final"])
   append!(__params, @parameters (Cx::Real), [misc = "final"])
   append!(__params, @parameters (Cy::Real), [misc = "final"])
   append!(__params, @parameters (SHxa::Real), [misc = "final"])
@@ -481,18 +507,18 @@ connectors that can be connected together ([`Frame3D`](@ref))
   ### Deferred assignment (default values that depend on final parameters)
 
   ### Symbolic Parameters
-  __local__width = width
-  append!(__params, @parameters (width::Real))
-  __dyad_seed_parameter!(__initial_conditions, __bindings, width, __local__width)
-  __local__unloaded_radius = unloaded_radius
-  append!(__params, @parameters (unloaded_radius::Real))
-  __dyad_seed_parameter!(__initial_conditions, __bindings, unloaded_radius, __local__unloaded_radius)
-  __local__vertical_stiffness = vertical_stiffness
-  append!(__params, @parameters (vertical_stiffness::Real))
-  __dyad_seed_parameter!(__initial_conditions, __bindings, vertical_stiffness, __local__vertical_stiffness)
-  __local__vertical_damping = vertical_damping
-  append!(__params, @parameters (vertical_damping::Real))
-  __dyad_seed_parameter!(__initial_conditions, __bindings, vertical_damping, __local__vertical_damping)
+  __local__WIDTH = WIDTH
+  append!(__params, @parameters (WIDTH::Real))
+  __dyad_seed_parameter!(__initial_conditions, __bindings, WIDTH, __local__WIDTH)
+  __local__UNLOADED_RADIUS = UNLOADED_RADIUS
+  append!(__params, @parameters (UNLOADED_RADIUS::Real))
+  __dyad_seed_parameter!(__initial_conditions, __bindings, UNLOADED_RADIUS, __local__UNLOADED_RADIUS)
+  __local__VERTICAL_STIFFNESS = VERTICAL_STIFFNESS
+  append!(__params, @parameters (VERTICAL_STIFFNESS::Real))
+  __dyad_seed_parameter!(__initial_conditions, __bindings, VERTICAL_STIFFNESS, __local__VERTICAL_STIFFNESS)
+  __local__VERTICAL_DAMPING = VERTICAL_DAMPING
+  append!(__params, @parameters (VERTICAL_DAMPING::Real))
+  __dyad_seed_parameter!(__initial_conditions, __bindings, VERTICAL_DAMPING, __local__VERTICAL_DAMPING)
   __local__FNOMIN = FNOMIN
   append!(__params, @parameters (FNOMIN::Real))
   __dyad_seed_parameter!(__initial_conditions, __bindings, FNOMIN, __local__FNOMIN)
@@ -505,12 +531,33 @@ connectors that can be connected together ([`Frame3D`](@ref))
   __local__FREFF = FREFF
   append!(__params, @parameters (FREFF::Real))
   __dyad_seed_parameter!(__initial_conditions, __bindings, FREFF, __local__FREFF)
-  __local__longitudinal_stiffness = longitudinal_stiffness
-  append!(__params, @parameters (longitudinal_stiffness::Real), [description = "Tyre overall longitudinal stiffness. Sets the relaxation length."])
-  __dyad_seed_parameter!(__initial_conditions, __bindings, longitudinal_stiffness, __local__longitudinal_stiffness)
-  __local__lateral_stiffness = lateral_stiffness
-  append!(__params, @parameters (lateral_stiffness::Real), [description = "Tyre overall lateral stiffness. Sets the lateral relaxation length."])
-  __dyad_seed_parameter!(__initial_conditions, __bindings, lateral_stiffness, __local__lateral_stiffness)
+  __local__LONGITUDINAL_STIFFNESS = LONGITUDINAL_STIFFNESS
+  append!(__params, @parameters (LONGITUDINAL_STIFFNESS::Real), [description = "Tyre overall longitudinal stiffness. Sets the relaxation length."])
+  __dyad_seed_parameter!(__initial_conditions, __bindings, LONGITUDINAL_STIFFNESS, __local__LONGITUDINAL_STIFFNESS)
+  __local__LATERAL_STIFFNESS = LATERAL_STIFFNESS
+  append!(__params, @parameters (LATERAL_STIFFNESS::Real), [description = "Overall lateral stiffness at nominal load and inflation pressure."])
+  __dyad_seed_parameter!(__initial_conditions, __bindings, LATERAL_STIFFNESS, __local__LATERAL_STIFFNESS)
+  __local__PCFY1 = PCFY1
+  append!(__params, @parameters (PCFY1::Real), [description = "Linear load term in lateral stiffness."])
+  __dyad_seed_parameter!(__initial_conditions, __bindings, PCFY1, __local__PCFY1)
+  __local__PCFY2 = PCFY2
+  append!(__params, @parameters (PCFY2::Real), [description = "Quadratic load term in lateral stiffness."])
+  __dyad_seed_parameter!(__initial_conditions, __bindings, PCFY2, __local__PCFY2)
+  __local__PCFY3 = PCFY3
+  append!(__params, @parameters (PCFY3::Real), [description = "Linear pressure term in lateral stiffness."])
+  __dyad_seed_parameter!(__initial_conditions, __bindings, PCFY3, __local__PCFY3)
+  __local__STRUCTURAL_LOAD_MIN = STRUCTURAL_LOAD_MIN
+  append!(__params, @parameters (STRUCTURAL_LOAD_MIN::Real))
+  __dyad_seed_parameter!(__initial_conditions, __bindings, STRUCTURAL_LOAD_MIN, __local__STRUCTURAL_LOAD_MIN)
+  __local__STRUCTURAL_LOAD_MAX = STRUCTURAL_LOAD_MAX
+  append!(__params, @parameters (STRUCTURAL_LOAD_MAX::Real))
+  __dyad_seed_parameter!(__initial_conditions, __bindings, STRUCTURAL_LOAD_MAX, __local__STRUCTURAL_LOAD_MAX)
+  __local__STRUCTURAL_PRESSURE_MIN = STRUCTURAL_PRESSURE_MIN
+  append!(__params, @parameters (STRUCTURAL_PRESSURE_MIN::Real))
+  __dyad_seed_parameter!(__initial_conditions, __bindings, STRUCTURAL_PRESSURE_MIN, __local__STRUCTURAL_PRESSURE_MIN)
+  __local__STRUCTURAL_PRESSURE_MAX = STRUCTURAL_PRESSURE_MAX
+  append!(__params, @parameters (STRUCTURAL_PRESSURE_MAX::Real))
+  __dyad_seed_parameter!(__initial_conditions, __bindings, STRUCTURAL_PRESSURE_MAX, __local__STRUCTURAL_PRESSURE_MAX)
   __local__INFLPRES = INFLPRES
   append!(__params, @parameters (INFLPRES::Real))
   __dyad_seed_parameter!(__initial_conditions, __bindings, INFLPRES, __local__INFLPRES)
@@ -934,9 +981,10 @@ connectors that can be connected together ([`Frame3D`](@ref))
   __bindings[sty_grey_medium] = [0.328125, 0.3515625, 0.375, 1]
   __bindings[sty_grey_dark] = [0.1953125, 0.21484375, 0.234375, 1]
   __bindings[side] = ifelse(is_left, 1.0, -1.0)
-  __bindings[rho_Fz0] = FNOMIN / vertical_stiffness
+  __bindings[rho_Fz0] = FNOMIN / VERTICAL_STIFFNESS
   __bindings[Fz0_prime] = LFZO * FNOMIN
   __bindings[dpi] = (INFLPRES - NOMPRES) / NOMPRES
+  __bindings[structural_dpi] = (min(max(INFLPRES, STRUCTURAL_PRESSURE_MIN), STRUCTURAL_PRESSURE_MAX) - NOMPRES) / NOMPRES
   __bindings[Cx] = PCX1 * LCX
   __bindings[Cy] = PCY1 * LCY
   __bindings[SHxa] = RHX1
@@ -980,7 +1028,9 @@ connectors that can be connected together ([`Frame3D`](@ref))
   append!(__vars, @variables (v_dot_free(t)::Real), [description = "Unlimited right-hand side of (7.11), before the (7.25) deflection limiter"])
   append!(__vars, @variables (alpha_sl(t)::Real), [description = "Equivalent slip angle at which the (7.25) limiter arms, 3*Dy/CFalpha"])
   append!(__vars, @variables (alpha_prime(t)::Real), [description = "Transient lateral slip tan(alpha') (7.26). What the Magic Formula is fed."])
-  append!(__vars, @variables (sigma_alpha(t)::Real), [description = "Lateral relaxation length (7.12)"])
+  append!(__vars, @variables (structural_dfz(t)::Real), [description = "Fractional load change from FNOMIN after limiting Fz to the structural fit range (4.E2a)."])
+  append!(__vars, @variables (cy(t)::Real), [description = "Lateral structural stiffness at the bounded load and pressure, in N/m (Besselink et al., Eq. 18)."])
+  append!(__vars, @variables (sigma_alpha(t)::Real), [description = "Lateral relaxation length (7.6)"])
   append!(__vars, @variables (dfz(t)::Real))
   append!(__vars, @variables (gamma_star(t)::Real))
   append!(__vars, @variables (lam_mux_star(t)::Real))
@@ -1029,7 +1079,16 @@ connectors that can be connected together ([`Frame3D`](@ref))
   append!(__vars, @variables (Dvyk(t)::Real))
   append!(__vars, @variables (SVyk(t)::Real))
   append!(__vars, @variables (Fy(t)::Real), [description = "Combined-slip lateral force (4.E58)"])
-  append!(__vars, @variables (Fy_prime(t)::Real), [description = "Lateral force without the kappa-induced shift (4.E74), what the trail acts on"])
+  append!(__vars, @variables (Dy_trail(t)::Real))
+  append!(__vars, @variables (Kya_trail(t)::Real))
+  append!(__vars, @variables (By_trail(t)::Real))
+  append!(__vars, @variables (ay_trail(t)::Real))
+  append!(__vars, @variables (Ey_trail_raw(t)::Real))
+  append!(__vars, @variables (Ey_trail(t)::Real))
+  append!(__vars, @variables (Fy0_trail(t)::Real))
+  append!(__vars, @variables (Byk_trail(t)::Real))
+  append!(__vars, @variables (Gyk_trail(t)::Real))
+  append!(__vars, @variables (Fy_prime(t)::Real), [description = "Zero-camber lateral force in the trail contribution (4.E74)"])
   append!(__vars, @variables (SHt(t)::Real))
   append!(__vars, @variables (alpha_t(t)::Real))
   append!(__vars, @variables (Bt(t)::Real))
@@ -1153,6 +1212,12 @@ connectors that can be connected together ([`Frame3D`](@ref))
   __ovr_alpha_prime = pop!(__overrides, "alpha_prime", nothing); isnothing(__ovr_alpha_prime) || push!(__eqs, alpha_prime ~ __ovr_alpha_prime)
   __ovr_alpha_prime__initial = pop!(__overrides, "alpha_prime.initial", nothing); isnothing(__ovr_alpha_prime__initial) || (__initial_conditions[alpha_prime] = __ovr_alpha_prime__initial)
   __ovr_alpha_prime__guess = pop!(__overrides, "alpha_prime.guess", nothing)
+  __ovr_structural_dfz = pop!(__overrides, "structural_dfz", nothing); isnothing(__ovr_structural_dfz) || push!(__eqs, structural_dfz ~ __ovr_structural_dfz)
+  __ovr_structural_dfz__initial = pop!(__overrides, "structural_dfz.initial", nothing); isnothing(__ovr_structural_dfz__initial) || (__initial_conditions[structural_dfz] = __ovr_structural_dfz__initial)
+  __ovr_structural_dfz__guess = pop!(__overrides, "structural_dfz.guess", nothing)
+  __ovr_cy = pop!(__overrides, "cy", nothing); isnothing(__ovr_cy) || push!(__eqs, cy ~ __ovr_cy)
+  __ovr_cy__initial = pop!(__overrides, "cy.initial", nothing); isnothing(__ovr_cy__initial) || (__initial_conditions[cy] = __ovr_cy__initial)
+  __ovr_cy__guess = pop!(__overrides, "cy.guess", nothing)
   __ovr_sigma_alpha = pop!(__overrides, "sigma_alpha", nothing); isnothing(__ovr_sigma_alpha) || push!(__eqs, sigma_alpha ~ __ovr_sigma_alpha)
   __ovr_sigma_alpha__initial = pop!(__overrides, "sigma_alpha.initial", nothing); isnothing(__ovr_sigma_alpha__initial) || (__initial_conditions[sigma_alpha] = __ovr_sigma_alpha__initial)
   __ovr_sigma_alpha__guess = pop!(__overrides, "sigma_alpha.guess", nothing)
@@ -1300,6 +1365,33 @@ connectors that can be connected together ([`Frame3D`](@ref))
   __ovr_Fy = pop!(__overrides, "Fy", nothing); isnothing(__ovr_Fy) || push!(__eqs, Fy ~ __ovr_Fy)
   __ovr_Fy__initial = pop!(__overrides, "Fy.initial", nothing); isnothing(__ovr_Fy__initial) || (__initial_conditions[Fy] = __ovr_Fy__initial)
   __ovr_Fy__guess = pop!(__overrides, "Fy.guess", nothing)
+  __ovr_Dy_trail = pop!(__overrides, "Dy_trail", nothing); isnothing(__ovr_Dy_trail) || push!(__eqs, Dy_trail ~ __ovr_Dy_trail)
+  __ovr_Dy_trail__initial = pop!(__overrides, "Dy_trail.initial", nothing); isnothing(__ovr_Dy_trail__initial) || (__initial_conditions[Dy_trail] = __ovr_Dy_trail__initial)
+  __ovr_Dy_trail__guess = pop!(__overrides, "Dy_trail.guess", nothing)
+  __ovr_Kya_trail = pop!(__overrides, "Kya_trail", nothing); isnothing(__ovr_Kya_trail) || push!(__eqs, Kya_trail ~ __ovr_Kya_trail)
+  __ovr_Kya_trail__initial = pop!(__overrides, "Kya_trail.initial", nothing); isnothing(__ovr_Kya_trail__initial) || (__initial_conditions[Kya_trail] = __ovr_Kya_trail__initial)
+  __ovr_Kya_trail__guess = pop!(__overrides, "Kya_trail.guess", nothing)
+  __ovr_By_trail = pop!(__overrides, "By_trail", nothing); isnothing(__ovr_By_trail) || push!(__eqs, By_trail ~ __ovr_By_trail)
+  __ovr_By_trail__initial = pop!(__overrides, "By_trail.initial", nothing); isnothing(__ovr_By_trail__initial) || (__initial_conditions[By_trail] = __ovr_By_trail__initial)
+  __ovr_By_trail__guess = pop!(__overrides, "By_trail.guess", nothing)
+  __ovr_ay_trail = pop!(__overrides, "ay_trail", nothing); isnothing(__ovr_ay_trail) || push!(__eqs, ay_trail ~ __ovr_ay_trail)
+  __ovr_ay_trail__initial = pop!(__overrides, "ay_trail.initial", nothing); isnothing(__ovr_ay_trail__initial) || (__initial_conditions[ay_trail] = __ovr_ay_trail__initial)
+  __ovr_ay_trail__guess = pop!(__overrides, "ay_trail.guess", nothing)
+  __ovr_Ey_trail_raw = pop!(__overrides, "Ey_trail_raw", nothing); isnothing(__ovr_Ey_trail_raw) || push!(__eqs, Ey_trail_raw ~ __ovr_Ey_trail_raw)
+  __ovr_Ey_trail_raw__initial = pop!(__overrides, "Ey_trail_raw.initial", nothing); isnothing(__ovr_Ey_trail_raw__initial) || (__initial_conditions[Ey_trail_raw] = __ovr_Ey_trail_raw__initial)
+  __ovr_Ey_trail_raw__guess = pop!(__overrides, "Ey_trail_raw.guess", nothing)
+  __ovr_Ey_trail = pop!(__overrides, "Ey_trail", nothing); isnothing(__ovr_Ey_trail) || push!(__eqs, Ey_trail ~ __ovr_Ey_trail)
+  __ovr_Ey_trail__initial = pop!(__overrides, "Ey_trail.initial", nothing); isnothing(__ovr_Ey_trail__initial) || (__initial_conditions[Ey_trail] = __ovr_Ey_trail__initial)
+  __ovr_Ey_trail__guess = pop!(__overrides, "Ey_trail.guess", nothing)
+  __ovr_Fy0_trail = pop!(__overrides, "Fy0_trail", nothing); isnothing(__ovr_Fy0_trail) || push!(__eqs, Fy0_trail ~ __ovr_Fy0_trail)
+  __ovr_Fy0_trail__initial = pop!(__overrides, "Fy0_trail.initial", nothing); isnothing(__ovr_Fy0_trail__initial) || (__initial_conditions[Fy0_trail] = __ovr_Fy0_trail__initial)
+  __ovr_Fy0_trail__guess = pop!(__overrides, "Fy0_trail.guess", nothing)
+  __ovr_Byk_trail = pop!(__overrides, "Byk_trail", nothing); isnothing(__ovr_Byk_trail) || push!(__eqs, Byk_trail ~ __ovr_Byk_trail)
+  __ovr_Byk_trail__initial = pop!(__overrides, "Byk_trail.initial", nothing); isnothing(__ovr_Byk_trail__initial) || (__initial_conditions[Byk_trail] = __ovr_Byk_trail__initial)
+  __ovr_Byk_trail__guess = pop!(__overrides, "Byk_trail.guess", nothing)
+  __ovr_Gyk_trail = pop!(__overrides, "Gyk_trail", nothing); isnothing(__ovr_Gyk_trail) || push!(__eqs, Gyk_trail ~ __ovr_Gyk_trail)
+  __ovr_Gyk_trail__initial = pop!(__overrides, "Gyk_trail.initial", nothing); isnothing(__ovr_Gyk_trail__initial) || (__initial_conditions[Gyk_trail] = __ovr_Gyk_trail__initial)
+  __ovr_Gyk_trail__guess = pop!(__overrides, "Gyk_trail.guess", nothing)
   __ovr_Fy_prime = pop!(__overrides, "Fy_prime", nothing); isnothing(__ovr_Fy_prime) || push!(__eqs, Fy_prime ~ __ovr_Fy_prime)
   __ovr_Fy_prime__initial = pop!(__overrides, "Fy_prime.initial", nothing); isnothing(__ovr_Fy_prime__initial) || (__initial_conditions[Fy_prime] = __ovr_Fy_prime__initial)
   __ovr_Fy_prime__guess = pop!(__overrides, "Fy_prime.guess", nothing)
@@ -1394,12 +1486,12 @@ connectors that can be connected together ([`Frame3D`](@ref))
   visual_dict = Dict{String, Any}()
   visual_dict["r"] = ModelingToolkit.default_to_parentscope(wheel_center.r_0)
   visual_dict["R"] = ModelingToolkit.default_to_parentscope(transpose(wheel_center.R))
-  visual_dict["r_shape"] = ModelingToolkit.default_to_parentscope([0, -width / 2, 0])
+  visual_dict["r_shape"] = ModelingToolkit.default_to_parentscope([0, -WIDTH / 2, 0])
   visual_dict["length_direction"] = ModelingToolkit.default_to_parentscope([0, 1, 0])
   visual_dict["width_direction"] = ModelingToolkit.default_to_parentscope([1, 0, 0])
-  visual_dict["length"] = ModelingToolkit.default_to_parentscope(width)
-  visual_dict["width"] = ModelingToolkit.default_to_parentscope(2 * unloaded_radius)
-  visual_dict["height"] = ModelingToolkit.default_to_parentscope(2 * unloaded_radius)
+  visual_dict["length"] = ModelingToolkit.default_to_parentscope(WIDTH)
+  visual_dict["width"] = ModelingToolkit.default_to_parentscope(2 * UNLOADED_RADIUS)
+  visual_dict["height"] = ModelingToolkit.default_to_parentscope(2 * UNLOADED_RADIUS)
   merge!(visual_dict, visual_overrides)
   push!(__systems, @named visual = MultibodyComponents.CylinderShape(; color=sty_black, __overrides = visual_dict))
 
@@ -1439,6 +1531,8 @@ connectors that can be connected together ([`Frame3D`](@ref))
   isnothing(__ovr_v_dot_free__guess) || (__guesses[v_dot_free] = __ovr_v_dot_free__guess)
   isnothing(__ovr_alpha_sl__guess) || (__guesses[alpha_sl] = __ovr_alpha_sl__guess)
   isnothing(__ovr_alpha_prime__guess) || (__guesses[alpha_prime] = __ovr_alpha_prime__guess)
+  isnothing(__ovr_structural_dfz__guess) || (__guesses[structural_dfz] = __ovr_structural_dfz__guess)
+  isnothing(__ovr_cy__guess) || (__guesses[cy] = __ovr_cy__guess)
   isnothing(__ovr_sigma_alpha__guess) || (__guesses[sigma_alpha] = __ovr_sigma_alpha__guess)
   isnothing(__ovr_dfz__guess) || (__guesses[dfz] = __ovr_dfz__guess)
   isnothing(__ovr_gamma_star__guess) || (__guesses[gamma_star] = __ovr_gamma_star__guess)
@@ -1488,6 +1582,15 @@ connectors that can be connected together ([`Frame3D`](@ref))
   isnothing(__ovr_Dvyk__guess) || (__guesses[Dvyk] = __ovr_Dvyk__guess)
   isnothing(__ovr_SVyk__guess) || (__guesses[SVyk] = __ovr_SVyk__guess)
   isnothing(__ovr_Fy__guess) || (__guesses[Fy] = __ovr_Fy__guess)
+  isnothing(__ovr_Dy_trail__guess) || (__guesses[Dy_trail] = __ovr_Dy_trail__guess)
+  isnothing(__ovr_Kya_trail__guess) || (__guesses[Kya_trail] = __ovr_Kya_trail__guess)
+  isnothing(__ovr_By_trail__guess) || (__guesses[By_trail] = __ovr_By_trail__guess)
+  isnothing(__ovr_ay_trail__guess) || (__guesses[ay_trail] = __ovr_ay_trail__guess)
+  isnothing(__ovr_Ey_trail_raw__guess) || (__guesses[Ey_trail_raw] = __ovr_Ey_trail_raw__guess)
+  isnothing(__ovr_Ey_trail__guess) || (__guesses[Ey_trail] = __ovr_Ey_trail__guess)
+  isnothing(__ovr_Fy0_trail__guess) || (__guesses[Fy0_trail] = __ovr_Fy0_trail__guess)
+  isnothing(__ovr_Byk_trail__guess) || (__guesses[Byk_trail] = __ovr_Byk_trail__guess)
+  isnothing(__ovr_Gyk_trail__guess) || (__guesses[Gyk_trail] = __ovr_Gyk_trail__guess)
   isnothing(__ovr_Fy_prime__guess) || (__guesses[Fy_prime] = __ovr_Fy_prime__guess)
   isnothing(__ovr_SHt__guess) || (__guesses[SHt] = __ovr_SHt__guess)
   isnothing(__ovr_alpha_t__guess) || (__guesses[alpha_t] = __ovr_alpha_t__guess)
@@ -1534,12 +1637,12 @@ connectors that can be connected together ([`Frame3D`](@ref))
   push!(__eqs, outputs.slip ~ kappa)
   push!(__eqs, z_w ~ getindex(getproperty(wheel_center, :r_0), 3) - road.outputs.z)
   push!(__eqs, v_z ~ ModelingToolkit.D_nounits(z_w))
-  push!(__eqs, z_bottom ~ z_w - unloaded_radius)
+  push!(__eqs, z_bottom ~ z_w - UNLOADED_RADIUS)
   push!(__eqs, rho ~ ifelse(z_bottom < 0, -z_bottom, 0))
-  push!(__eqs, loaded_radius ~ unloaded_radius - rho)
-  push!(__eqs, Fz_raw ~ vertical_stiffness * rho - vertical_damping * v_z)
+  push!(__eqs, loaded_radius ~ UNLOADED_RADIUS - rho)
+  push!(__eqs, Fz_raw ~ VERTICAL_STIFFNESS * rho - VERTICAL_DAMPING * v_z)
   push!(__eqs, Fz ~ ifelse(rho > 0, ifelse(Fz_raw > 0, Fz_raw, 0), 0))
-  push!(__eqs, Re ~ unloaded_radius - rho_Fz0 * (DREFF * atan(BREFF * (rho / rho_Fz0)) + FREFF * (rho / rho_Fz0)))
+  push!(__eqs, Re ~ UNLOADED_RADIUS - rho_Fz0 * (DREFF * atan(BREFF * (rho / rho_Fz0)) + FREFF * (rho / rho_Fz0)))
   push!(__eqs, gamma_star ~ side * getindex(getproperty(wheel_center, :R), 2, 3))
   push!(__eqs, cos_gamma ~ sqrt(max(1 - gamma_star ^ 2, eps_gamma ^ 2)))
   push!(__eqs, x_w ~ getindex(getproperty(wheel_center, :r_0), 1))
@@ -1550,7 +1653,7 @@ connectors that can be connected together ([`Frame3D`](@ref))
   push!(__eqs, V_y ~ (v_wx * getindex(getproperty(wheel_center, :R), 2, 1) + v_wy * getindex(getproperty(wheel_center, :R), 2, 2)) / cos_gamma)
   push!(__eqs, omega ~ ModelingToolkit.D_nounits(spline.phi))
   push!(__eqs, V_sx ~ V_x - omega * Re)
-  push!(__eqs, V_s ~ abs(V_sx))
+  push!(__eqs, V_s ~ sqrt(V_sx ^ 2 + V_y_mf ^ 2))
   push!(__eqs, kappa ~ -V_sx / ifelse(abs(V_x) > eps_v, abs(V_x), eps_v))
   push!(__eqs, V_y_mf ~ side * V_y)
   push!(__eqs, alpha ~ atan(V_y_mf / ifelse(abs(V_x) > eps_v, abs(V_x), eps_v)))
@@ -1569,7 +1672,7 @@ connectors that can be connected together ([`Frame3D`](@ref))
   push!(__eqs, Dx ~ mu_x * Fz)
   push!(__eqs, Bx ~ Kxk / (Cx * Dx + eps_x))
   push!(__eqs, SHx ~ (PHX1 + PHX2 * dfz) * LHX * lam_low)
-  push!(__eqs, sigma_kappa ~ max(Kxk / longitudinal_stiffness, eps_sigma))
+  push!(__eqs, sigma_kappa ~ max(Kxk / LONGITUDINAL_STIFFNESS, eps_sigma))
   push!(__eqs, u_dot_free ~ -V_sx - abs(V_x) * u_x / sigma_kappa)
   push!(__eqs, kappa_prime ~ (u_x - damp_vlow * (1 - lam_low) * V_sx) / sigma_kappa)
   push!(__eqs, alpha_sl ~ 3 * abs(Dy) / max(abs(Kya), eps_k))
@@ -1587,10 +1690,12 @@ connectors that can be connected together ([`Frame3D`](@ref))
   push!(__eqs, SVyg ~ Fz * (PVY3 + PVY4 * dfz) * gamma_star * LKYC * lam_muy_prime * lam_low)
   push!(__eqs, SHy ~ (PHY1 + PHY2 * dfz) * LHY * lam_low + (Kyg0 * gamma_star - SVyg) / Kya_prime)
   push!(__eqs, By ~ Kya / (Cy * Dy + ifelse(Dy >= 0, eps_y, -eps_y)))
-  push!(__eqs, sigma_alpha ~ max(abs(Kya) / lateral_stiffness, eps_sigma))
+  push!(__eqs, structural_dfz ~ (min(max(Fz, STRUCTURAL_LOAD_MIN), STRUCTURAL_LOAD_MAX) - FNOMIN) / FNOMIN)
+  push!(__eqs, cy ~ LATERAL_STIFFNESS * (1 + PCFY1 * structural_dfz + PCFY2 * structural_dfz ^ 2) * (1 + PCFY3 * structural_dpi))
+  push!(__eqs, sigma_alpha ~ max(abs(Kya) / cy, eps_sigma))
   push!(__eqs, v_dot_free ~ V_y_mf - abs(V_x) * v_y / sigma_alpha)
   push!(__eqs, alpha_prime ~ (v_y + damp_vlow * (1 - lam_low) * V_y_mf) / sigma_alpha)
-  push!(__eqs, ModelingToolkit.D_nounits(v_y) ~ ifelse(abs(alpha_r_eq) > alpha_sl, ifelse(abs(V_x) < eps_v, ifelse((-V_y_mf + V_x * v_y / sigma_alpha) * v_y < 0, 0, v_dot_free), v_dot_free), v_dot_free))
+  push!(__eqs, ModelingToolkit.D_nounits(v_y) ~ ifelse(abs(alpha_r_eq) > alpha_sl, ifelse(abs(V_x) < eps_v, ifelse((-V_y_mf + abs(V_x) * v_y / sigma_alpha) * v_y < 0, 0, v_dot_free), v_dot_free), v_dot_free))
   push!(__eqs, alpha_y ~ alpha_prime + SHy)
   push!(__eqs, Ey_raw ~ (PEY1 + PEY2 * dfz) * (1 + PEY5 * gamma_star ^ 2 - (PEY3 + PEY4 * gamma_star) * ifelse(alpha_y >= 0, 1, -1)) * LEY)
   push!(__eqs, Ey ~ ifelse(Ey_raw > 1, 1, Ey_raw))
@@ -1613,24 +1718,33 @@ connectors that can be connected together ([`Frame3D`](@ref))
   push!(__eqs, Dvyk ~ mu_y * Fz * (RVY1 + RVY2 * dfz + RVY3 * gamma_star) * cos(atan(RVY4 * alpha_prime)))
   push!(__eqs, SVyk ~ Dvyk * sin(RVY5 * atan(RVY6 * kappa_prime)) * LVYKA)
   push!(__eqs, Fy ~ Gyk * Fy0 + SVyk)
-  push!(__eqs, Fy_prime ~ Gyk * Fy0)
+  push!(__eqs, Dy_trail ~ Fz * (PDY1 + PDY2 * dfz) * (1 + PPY3 * dpi + PPY4 * dpi ^ 2) * lam_muy_star)
+  push!(__eqs, Kya_trail ~ PKY1 * Fz0_prime * (1 + PPY1 * dpi) * sin(PKY4 * atan((Fz / Fz0_prime) / (PKY2 * (1 + PPY2 * dpi)))) * LKY)
+  push!(__eqs, By_trail ~ Kya_trail / (Cy * Dy_trail + ifelse(Dy_trail >= 0, eps_y, -eps_y)))
+  push!(__eqs, ay_trail ~ alpha_prime + (PHY1 + PHY2 * dfz) * LHY * lam_low)
+  push!(__eqs, Ey_trail_raw ~ (PEY1 + PEY2 * dfz) * (1 - PEY3 * ifelse(ay_trail >= 0, 1, -1)) * LEY)
+  push!(__eqs, Ey_trail ~ min(1, Ey_trail_raw))
+  push!(__eqs, Fy0_trail ~ Dy_trail * sin(Cy * atan(By_trail * ay_trail - Ey_trail * (By_trail * ay_trail - atan(By_trail * ay_trail)))) + Fz * (PVY1 + PVY2 * dfz) * lam_muy_prime * LVY * lam_low)
+  push!(__eqs, Byk_trail ~ RBY1 * cos(atan(RBY2 * (alpha_prime - RBY3))) * LYKA)
+  push!(__eqs, Gyk_trail ~ cos(Cyk * atan(Byk_trail * kappa_s - Eyk * (Byk_trail * kappa_s - atan(Byk_trail * kappa_s)))) / cos(Cyk * atan(Byk_trail * SHyk - Eyk * (Byk_trail * SHyk - atan(Byk_trail * SHyk)))))
+  push!(__eqs, Fy_prime ~ Gyk_trail * Fy0_trail)
   push!(__eqs, SHt ~ QHZ1 + QHZ2 * dfz + (QHZ3 + QHZ4 * dfz) * gamma_star)
   push!(__eqs, alpha_t ~ alpha_prime + SHt)
   push!(__eqs, Bt ~ (QBZ1 + QBZ2 * dfz + QBZ3 * dfz ^ 2) * (1 + QBZ5 * abs(gamma_star) + QBZ6 * gamma_star ^ 2) * (LKY / lam_muy_star))
-  push!(__eqs, Dt0 ~ Fz * (unloaded_radius / Fz0_prime) * (QDZ1 + QDZ2 * dfz) * (1 - PPZ1 * dpi) * LTR * sgn_Vx)
+  push!(__eqs, Dt0 ~ Fz * (UNLOADED_RADIUS / Fz0_prime) * (QDZ1 + QDZ2 * dfz) * (1 - PPZ1 * dpi) * LTR * sgn_Vx)
   push!(__eqs, Dt ~ Dt0 * (1 + QDZ3 * abs(gamma_star) + QDZ4 * gamma_star ^ 2))
   push!(__eqs, Et_raw ~ (QEZ1 + QEZ2 * dfz + QEZ3 * dfz ^ 2) * (1 + (QEZ4 + QEZ5 * gamma_star) * (2 / π) * atan(Bt * Ct * alpha_t)))
   push!(__eqs, Et ~ ifelse(Et_raw > 1, 1, Et_raw))
   push!(__eqs, SHf ~ SHy + SVy / Kya_prime)
   push!(__eqs, alpha_r ~ alpha_prime + SHf)
   push!(__eqs, Br ~ QBZ9 * LKY / lam_muy_star + QBZ10 * By * Cy)
-  push!(__eqs, Dr ~ Fz * unloaded_radius * ((QDZ6 + QDZ7 * dfz) * LRES + ((QDZ8 + QDZ9 * dfz) * (1 + PPZ2 * dpi) + (QDZ10 + QDZ11 * dfz) * abs(gamma_star)) * gamma_star * LKZC) * lam_muy_star * sgn_Vx * cos_alpha)
+  push!(__eqs, Dr ~ Fz * UNLOADED_RADIUS * ((QDZ6 + QDZ7 * dfz) * LRES + ((QDZ8 + QDZ9 * dfz) * (1 + PPZ2 * dpi) + (QDZ10 + QDZ11 * dfz) * abs(gamma_star)) * gamma_star * LKZC) * lam_muy_star * sgn_Vx * cos_alpha)
   push!(__eqs, alpha_t_eq ~ sqrt(alpha_t ^ 2 + (Kxk / Kya_prime) ^ 2 * kappa_prime ^ 2) * ifelse(alpha_t >= 0, 1, -1))
   push!(__eqs, alpha_r_eq ~ sqrt(alpha_r ^ 2 + (Kxk / Kya_prime) ^ 2 * kappa_prime ^ 2) * ifelse(alpha_r >= 0, 1, -1))
   push!(__eqs, t_pneu ~ Dt * cos(Ct * atan(Bt * alpha_t_eq - Et * (Bt * alpha_t_eq - atan(Bt * alpha_t_eq)))) * cos_alpha)
   push!(__eqs, Mz_prime ~ -t_pneu * Fy_prime)
   push!(__eqs, Mzr ~ Dr * cos(Cr * atan(Br * alpha_r_eq)) * cos_alpha)
-  push!(__eqs, s_arm ~ unloaded_radius * (SSZ1 + SSZ2 * (Fy / Fz0_prime) + (SSZ3 + SSZ4 * dfz) * gamma_star) * LS)
+  push!(__eqs, s_arm ~ UNLOADED_RADIUS * (SSZ1 + SSZ2 * (Fy / Fz0_prime) + (SSZ3 + SSZ4 * dfz) * gamma_star) * LS)
   push!(__eqs, Mz ~ Mz_prime + Mzr + s_arm * Fx)
   push!(__eqs, Fy_c ~ side * Fy)
   push!(__eqs, Mz_c ~ side * Mz)
