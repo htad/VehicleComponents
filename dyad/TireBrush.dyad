@@ -1,0 +1,316 @@
+component TireBrush
+  """
+  Combined-slip brush. The four states describe tread and carcass 
+  deformation in the two contact directions. The coefficients 
+  describe one dry inflation-pressure condition. Positive Fx drives
+  the wheel forward.
+  """
+
+  extends Styles
+
+  outputs = TireMF61Outputs() {^outputs}
+  spline = Dyad.Spline() {^spline}
+  wheel_center = Dyad.Frame3D() {^wheel_center}
+  road = VehicleComponents.RoadSurface() {^road}
+  visual = MultibodyComponents.CylinderShape(
+    color = sty_black,
+    r = wheel_center.r_0,
+    R = transpose(wheel_center.R),
+    r_shape = [0, -WIDTH / 2, 0],
+    length_direction = [0, 1, 0],
+    width_direction = [1, 0, 0],
+    length = WIDTH,
+    width = 2 * UNLOADED_RADIUS,
+    height = 2 * UNLOADED_RADIUS
+  ) {^visual}
+
+  "True for a wheel on the left side of the vehicle."
+  structural parameter is_left::Boolean
+
+  "Tire section width in metres."
+  parameter WIDTH::Length
+  "Tire radius at zero load, in metres."
+  parameter UNLOADED_RADIUS::Length
+  "Vertical force per metre of tire compression (N/m)."
+  parameter VERTICAL_STIFFNESS::TranslationalSpringConstant
+  "Vertical damping force per unit compression speed (N·s/m)."
+  parameter VERTICAL_DAMPING::TranslationalDampingConstant
+  "Fraction of vertical deflection subtracted from the unloaded radius to obtain the effective rolling radius (9.230)."
+  parameter FREFF::Real
+  "Nominal vertical load per tire in newtons. The fractional change in fitted load from FNOMIN is dfz."
+  parameter FNOMIN::Force
+  "Lower vertical load bound in newtons for evaluating the fitted properties."
+  parameter FIT_LOAD_MIN::Force
+  "Upper vertical load bound in newtons for evaluating the fitted properties."
+  parameter FIT_LOAD_MAX::Force
+  "Longitudinal slip stiffness divided by FNOMIN at zero slip and camber, per unit theoretical longitudinal slip."
+  parameter K_X_NOM::Real
+  "Lateral slip stiffness divided by FNOMIN at zero slip and camber under rolling conditions, per unit theoretical lateral slip."
+  parameter K_Y_NOM::Real
+  "Logarithmic load sensitivity of longitudinal slip stiffness divided by vertical load, per unit dfz."
+  parameter K_X_LOAD::Real
+  "Logarithmic load sensitivity of lateral slip stiffness divided by vertical load, per unit dfz."
+  parameter K_Y_LOAD::Real
+  "Amplitude of the log longitudinal stiffness correction. A positive value increases drive stiffness and reduces braking stiffness."
+  parameter K_X_DIRECTION::Real
+  "Change in log lateral slip stiffness per unit increase in the absolute sine of camber."
+  parameter K_Y_CAMBER::Real
+  "Longitudinal breakaway friction coefficient at FNOMIN and zero camber."
+  parameter MU_X_NOM::Real
+  "Lateral breakaway friction coefficient at FNOMIN, zero camber and zero side-slip speed under rolling conditions."
+  parameter MU_Y_NOM::Real
+  "Change in log longitudinal breakaway friction per unit fractional load change dfz."
+  parameter MU_X_LOAD::Real
+  "Change in log lateral breakaway friction per unit fractional load change dfz."
+  parameter MU_Y_LOAD::Real
+  "Change in log longitudinal breakaway friction per unit increase in the squared sine of camber."
+  parameter MU_X_CAMBER::Real
+  "Change in log lateral breakaway friction per unit increase in the squared sine of camber. Also scales aligning stiffness with camber."
+  parameter MU_Y_CAMBER::Real
+  "Amplitude of the log lateral friction correction. A positive value increases grip at positive effective lateral slip speed."
+  parameter MU_Y_DIRECTION::Real
+  "Maximum fractional reduction in lateral shear from longitudinal slip, between zero and one."
+  parameter COMBINED_Y_LOSS::Real
+  "Equivalent lateral slip per unit sine of camber at FNOMIN (4.17–4.18)."
+  parameter CAMBER_GAIN::Real
+  "Change in CAMBER_GAIN per unit fractional load change dfz."
+  parameter CAMBER_GAIN_LOAD::Real
+  "Signed equivalent lateral slip at zero steer and camber in the measured rolling direction."
+  parameter LATERAL_SLIP_BIAS::Real
+  "Ratio of slow-restart lateral slip stiffness to warm rolling lateral slip stiffness."
+  parameter K_Y_RESTART_RATIO::Real
+  "Ratio of slow-restart lateral breakaway friction to warm rolling lateral breakaway friction."
+  parameter MU_Y_RESTART_RATIO::Real
+  "Maximum absolute longitudinal speed in m/s at which the full slow-restart ratios apply."
+  parameter RESTART_SPEED_MAX::Velocity
+  "Minimum absolute longitudinal speed in m/s at which the full warm rolling properties apply."
+  parameter ROLLING_SPEED_MIN::Velocity
+  "Overall longitudinal structural stiffness in N/m, used to compute longitudinal relaxation length."
+  parameter LONGITUDINAL_STIFFNESS::TranslationalSpringConstant
+  "Overall lateral structural stiffness at FNOMIN in N/m, used to compute lateral relaxation length."
+  parameter LATERAL_STIFFNESS::TranslationalSpringConstant
+  "Change in log lateral structural stiffness per unit fractional load change dfz."
+  parameter LATERAL_STIFFNESS_LOAD::Real
+  "Half the longitudinal contact patch length at FNOMIN, in metres."
+  parameter CONTACT_HALF_LENGTH::Length
+  "Carcass damping divided by carcass stiffness, in seconds."
+  parameter CARCASS_TIME_CONSTANT::Time
+  "Multiplier on the geometric brush moment arm. At nominal load and small slip it scales the trail given by Eq. 3.14."
+  parameter MZ_TRAIL_SCALE::Real
+  "Rate of trail decay with combined tread slip. Zero selects the rigid-bristle first moment (3.12, 3.50)."
+  parameter MZ_TRAIL_RATE::Real
+  "Logarithmic load sensitivity of small-slip aligning stiffness divided by vertical load, per unit dfz."
+  parameter MZ_STIFFNESS_LOAD::Real
+  "Dimensionless sliding-arm coefficient. A positive value reduces the aligning moment as combined tread slip grows."
+  parameter MZ_SLIDING_ARM::Real
+  "Rate at which combined tread slip attenuates the residual camber moment. Zero disables attenuation."
+  parameter MZ_RESIDUAL_RATE::Real
+  "Residual moment coefficient per unit sine of camber at FNOMIN, normalized by vertical load times unloaded radius (4.E47)."
+  parameter MZ_CAMBER::Real
+  "Change in the residual camber moment coefficient per unit fractional load change dfz (4.E47)."
+  parameter MZ_CAMBER_LOAD::Real
+
+  "Sign for converting tire-local quantities to the contact frame, +1 for a left wheel and −1 for a right wheel."
+  final parameter side::Real = ifelse(is_left, 1, -1)
+
+  variable rho::Length
+  variable loaded_radius::Length
+  variable Re::Length
+  variable z_w::Length
+  variable Fz::Force
+  variable omega::AngularVelocity
+  variable cos_gamma::Real
+  variable sin_gamma::Real
+  variable V_x::Velocity
+  variable V_y::Velocity
+  variable V_roll::Velocity
+  variable drive_speed::Velocity
+  variable side_speed::Velocity
+  variable camber_slip::Real
+  variable kappa::Real
+  variable alpha::Angle
+  variable fit_load::Force
+  variable dfz::Real
+  variable rolling_fraction::Real
+  variable rolling_weight::Real
+  variable kx::Real
+  variable ky::Real
+  variable mu_ax::Real
+  variable mu_ay::Real
+  variable a::Length
+  variable sigma_x::Length
+  variable sigma_y::Length
+  variable total_x::Length
+  variable total_y::Length
+  variable carcass_x::Length
+  variable carcass_y::Length
+  variable sx::Real
+  variable sy::Real
+  variable transport::Velocity
+  variable demand::Real
+  variable adhesion::Real
+  variable sliding_weight::Real
+  variable sliding_norm::Real
+  variable slide_fx::Real
+  variable slide_fy::Real
+  variable normalized_fx::Real
+  variable normalized_fy::Real
+  variable Fx::Force
+  variable Fy::Force
+  variable lateral_efficiency::Real
+  variable trail_slip::Real
+  variable moment_demand::Real
+  variable arm_argument::Real
+  variable pneumatic_moment::Torque
+  variable camber_moment::Torque
+  variable Mz::Torque
+  variable fx_world::Force
+  variable fy_world::Force
+
+relations
+
+  initial total_x = 0
+  initial total_y = 0
+  initial carcass_x = 0
+  initial carcass_y = 0
+
+  # Spindle geometry, contact axes and connector signs follow TireMF61.
+  road.inputs.x = wheel_center.r_0[1]
+  road.inputs.y = wheel_center.r_0[2]
+  z_w = wheel_center.r_0[3] - road.outputs.z
+  rho = max(0, UNLOADED_RADIUS - z_w)
+  loaded_radius = UNLOADED_RADIUS - rho
+  Fz = ifelse(rho > 0, max(0, VERTICAL_STIFFNESS * rho - VERTICAL_DAMPING * der(z_w)), 0)
+
+  # Effective radius uses the linear loaded-radius term of Pacejka 9.230.
+  Re = UNLOADED_RADIUS - FREFF * rho
+  omega = der(spline.phi)
+  sin_gamma = side * wheel_center.R[2, 3]
+  cos_gamma = sqrt(max(1 - sin_gamma ^ 2, 1e-8))
+  V_x = (der(wheel_center.r_0[1]) * wheel_center.R[2, 2] - der(wheel_center.r_0[2]) * wheel_center.R[2, 1]) / cos_gamma
+  V_y = side * (der(wheel_center.r_0[1]) * wheel_center.R[2, 1] + der(wheel_center.r_0[2]) * wheel_center.R[2, 2]) / cos_gamma
+
+  # Pacejka 3.32–3.34. The brush uses rim rolling speed as the transport speed.
+  V_roll = omega * Re
+  drive_speed = V_roll - V_x
+
+  # Equivalent camber slip from 4.17–4.18, with a fitted load dependence.
+  camber_slip = (CAMBER_GAIN + CAMBER_GAIN_LOAD * dfz) * sin_gamma
+
+  # 7.10–7.11 plus an empirical rolling bias (cf. 4.E27). Both enter tread transport.
+  side_speed = -V_y + abs(V_roll) * (camber_slip + LATERAL_SLIP_BIAS)
+
+  # Controller telemetry follows TireMF61 (4.E3/4.E5), with a 1 m/s floor.
+  kappa = drive_speed / max(abs(V_x), 1.0)
+  alpha = atan(V_y / max(abs(V_x), 1.0))
+
+  # Empirical load laws. Beyond the test stations hold specific properties
+  # at the nearest endpoint. The actual Fz still scales the delivered wrench.
+  fit_load = min(max(Fz, FIT_LOAD_MIN), FIT_LOAD_MAX)
+  dfz = fit_load / FNOMIN - 1
+
+  # Empirical smooth interpolation between the slow restart and rolling tests.
+  rolling_fraction = min(max((abs(V_x) - RESTART_SPEED_MAX) / (ROLLING_SPEED_MIN - RESTART_SPEED_MAX), 0), 1)
+  rolling_weight = rolling_fraction ^ 2 * (3 - 2 * rolling_fraction)
+
+  # Empirical bounded drive/brake shear asymmetry. The speed scale is 1 m/s.
+  kx = K_X_NOM * exp(K_X_LOAD * dfz + K_X_DIRECTION * tanh(drive_speed / 1.0))
+  ky = K_Y_NOM * exp(K_Y_LOAD * dfz + K_Y_CAMBER * abs(sin_gamma)) * (K_Y_RESTART_RATIO + (1 - K_Y_RESTART_RATIO) * rolling_weight)
+  mu_ax = MU_X_NOM * exp(MU_X_LOAD * dfz + MU_X_CAMBER * sin_gamma ^ 2)
+  mu_ay = MU_Y_NOM * exp(MU_Y_LOAD * dfz + MU_Y_CAMBER * sin_gamma ^ 2 + MU_Y_DIRECTION * tanh(side_speed / max(0.05 * abs(V_roll), 0.05))) * (MU_Y_RESTART_RATIO + (1 - MU_Y_RESTART_RATIO) * rolling_weight)
+
+  # Small-deflection footprint scaling for a radially deflected circular tire.
+  a = CONTACT_HALF_LENGTH * sqrt(fit_load / FNOMIN)
+
+  # Besselink et al. (2010), 19–20. K is slip stiffness, C is structural stiffness.
+  sigma_x = fit_load * kx / LONGITUDINAL_STIFFNESS
+  sigma_y = fit_load * ky / (LATERAL_STIFFNESS * exp(LATERAL_STIFFNESS_LOAD * dfz))
+
+  # Besselink 23–25. Total deformation = a * tread slip + carcass deflection.
+  sx = (total_x - carcass_x) / a
+  sy = (total_y - carcass_y) / a
+  
+  # Pacejka 3.43–3.48. Separate axis stiffnesses and breakaway coefficients
+  # generalize the isotropic book solution. demand = 3 at total sliding.
+  demand = sqrt((kx * sx / mu_ax) ^ 2 + (ky * sy / mu_ay) ^ 2 + 1e-24)
+  adhesion = max(0, 1 - demand / 3)
+  
+  # Sliding fraction of the normal load, integrating 3.4 over the sliding region.
+  sliding_weight = (1 - adhesion) ^ 2 * (1 + 2 * adhesion)
+  
+  # Uncorrected sliding traction maximizes dissipation on the friction ellipse.
+  # The direction comes from transient tread slip, independent of tread stiffness.
+  sliding_norm = sqrt((mu_ax * sx) ^ 2 + (mu_ay * sy) ^ 2 + 1e-24)
+  slide_fx = mu_ax ^ 2 * sx / sliding_norm
+  slide_fy = mu_ay ^ 2 * sy / sliding_norm
+  
+  # Integrated adhering and sliding tractions (3.36–3.49).
+  normalized_fx = kx * sx * adhesion ^ 2 + slide_fx * sliding_weight
+  
+  # Empirical coupling loss, scaled by the remaining pure-lateral adhesion
+  # fraction (3.8). The reduction vanishes at full lateral sliding.
+  lateral_efficiency = 1 - COMBINED_Y_LOSS * max(0, 1 - abs(ky * sy / mu_ay) / 3) * (kx * sx / mu_ax) ^ 2 / (1 + (kx * sx / mu_ax) ^ 2)
+  normalized_fy = lateral_efficiency * (ky * sy * adhesion ^ 2 + slide_fy * sliding_weight)
+  Fx = Fz * normalized_fx
+  Fy = Fz * normalized_fy
+  
+  # Pacejka 4.E74 separates the zero-camber side-slip contribution from the
+  # residual camber moment. Use transient tread deformation for the aligning arm.
+  trail_slip = -sy + camber_slip + LATERAL_SLIP_BIAS
+  moment_demand = sqrt((trail_slip + camber_slip) ^ 2 + sx ^ 2 + 1e-24)
+  arm_argument = MZ_TRAIL_RATE * exp((K_Y_LOAD - MU_Y_LOAD) * dfz) * moment_demand
+  
+  # Empirical compliant contact arm: small-slip aligning stiffness follows 3.3.
+  # A bounded sliding-centre displacement allows residual trail beyond breakaway.
+  # With no calibrated arm, use the first moment of the parabolic brush (3.12, 3.50).
+  pneumatic_moment = ifelse(MZ_TRAIL_RATE > 0, Fz * MZ_TRAIL_SCALE * CONTACT_HALF_LENGTH * K_Y_NOM / 3 * exp(MZ_STIFFNESS_LOAD * dfz + MU_Y_CAMBER * sin_gamma ^ 2) * trail_slip * (1 - MZ_SLIDING_ARM * arm_argument ^ 2 / sqrt(1 + arm_argument ^ 2)) / (1 + arm_argument ^ 2), MZ_TRAIL_SCALE * a * Fz * (ky * sy * adhesion ^ 2 * (1 - 4 * adhesion / 3) - 3 * slide_fy * (adhesion * (1 - adhesion)) ^ 2))
+  
+  # Leading camber term of 4.E47, attenuated with combined deformation as in 4.E75.
+  camber_moment = UNLOADED_RADIUS * Fz * (MZ_CAMBER + MZ_CAMBER_LOAD * dfz) * sin_gamma / sqrt(1 + (MZ_RESIDUAL_RATE * moment_demand) ^ 2)
+  
+  # Smooth reversal of the leading edge within 0.01 m/s is a low-speed convention.
+  Mz = (pneumatic_moment + camber_moment) * V_roll / sqrt(V_roll ^ 2 + 0.0001)
+  
+  # Numerical continuation at lock. Retain post-breakaway deformation for the
+  # compliant arm. The rigid reference caps it at initial total sliding.
+  transport = max(abs(V_roll), sqrt((kx * drive_speed / mu_ax) ^ 2 + (ky * side_speed / mu_ay) ^ 2 + 1e-24) / ifelse(MZ_TRAIL_RATE > 0, 12, 3))
+  
+  # Besselink 23–25 in displacement form. Positive x and y states produce
+  # positive local forces. Release stored deformation when the wheel is airborne.
+  der(total_x) = ifelse(Fz > 0, drive_speed - transport * sx, -total_x / CARCASS_TIME_CONSTANT)
+  der(total_y) = ifelse(Fz > 0, side_speed - transport * sy, -total_y / CARCASS_TIME_CONSTANT)
+  der(carcass_x) = (ifelse(Fz > 0, max(0, sigma_x - a) * normalized_fx / kx, 0) - carcass_x) / CARCASS_TIME_CONSTANT
+  der(carcass_y) = (ifelse(Fz > 0, max(0, sigma_y - a) * normalized_fy / ky, 0) - carcass_y) / CARCASS_TIME_CONSTANT
+  fx_world = (Fx * wheel_center.R[2, 2] + side * Fy * wheel_center.R[2, 1]) / cos_gamma
+  fy_world = (side * Fy * wheel_center.R[2, 2] - Fx * wheel_center.R[2, 1]) / cos_gamma
+  wheel_center.f = -wheel_center.R * [fx_world, fy_world, Fz]
+  wheel_center.tau = -wheel_center.R * [loaded_radius * fy_world, -loaded_radius * fx_world, side * Mz]
+  spline.tau = Fx * loaded_radius
+  outputs.slip = kappa
+  outputs.Fx = Fx
+  outputs.Fy = Fy
+  outputs.Fz = Fz
+  outputs.alpha = alpha
+  outputs.omega = omega
+  outputs.Re = Re
+
+metadata {
+  "_links": {
+    "outputs": {
+      "Dyad": {"placement": {"diagram": {"x1": 950, "x2": 1050, "y1": 20, "y2": 120}}}
+    },
+    "spline": {
+      "Dyad": {"placement": {"diagram": {"x1": 950, "x2": 1050, "y1": 450, "y2": 550}}}
+    },
+    "wheel_center": {
+      "Dyad": {"placement": {"diagram": {"x1": -50, "x2": 50, "y1": 450, "y2": 550}}}
+    },
+    "road": {
+      "Dyad": {"placement": {"diagram": {"x1": 450, "x2": 550, "y1": 330, "y2": 430}}}
+    },
+    "visual": {
+      "Dyad": {"placement": {"diagram": {"x1": 450, "x2": 550, "y1": 450, "y2": 550}}}
+    }
+  }
+}
+end

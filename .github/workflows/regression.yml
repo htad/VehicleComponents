@@ -61,6 +61,7 @@ jobs:
           - generated/LinkageTestRig_test.jl
           - generated/SuspensionTestRig_test.jl
           - generated/TireTestRig_test.jl
+          - generated/TireBrushTestRig_test.jl
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
