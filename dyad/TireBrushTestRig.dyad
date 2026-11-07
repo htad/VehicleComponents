@@ -1,0 +1,230 @@
+test component TireBrushTestRig
+  "Prescribed-motion, single-wheel brush rig."
+  
+  world = MultibodyComponents.World(n = [0, 0, -1], render = false) {^world}
+  tire = VehicleComponents.TireBrush(
+    is_left = left_tire,
+    UNLOADED_RADIUS = unloaded_radius,
+    WIDTH = 0.2,
+    VERTICAL_STIFFNESS = 100000,
+    VERTICAL_DAMPING = 50,
+    FREFF = 0.33,
+    FNOMIN = 600,
+    FIT_LOAD_MIN = 200,
+    FIT_LOAD_MAX = 1200,
+    K_X_NOM = 32,
+    K_X_LOAD = 0,
+    K_Y_NOM = 36,
+    K_Y_LOAD = -0.25,
+    K_X_DIRECTION = 0,
+    K_Y_CAMBER = 0,
+    MU_X_CAMBER = 0,
+    MU_Y_CAMBER = 0,
+    MU_Y_DIRECTION = 0,
+    COMBINED_Y_LOSS = 0,
+    MZ_TRAIL_RATE = 0,
+    MZ_STIFFNESS_LOAD = 0,
+    MZ_SLIDING_ARM = 0,
+    MZ_RESIDUAL_RATE = 0,
+    MU_X_NOM = 2,
+    MU_X_LOAD = 0,
+    MU_Y_NOM = 2,
+    MU_Y_LOAD = -0.1,
+    CAMBER_GAIN = -0.06,
+    CAMBER_GAIN_LOAD = 0,
+    LATERAL_SLIP_BIAS = 0,
+    K_Y_RESTART_RATIO = 1,
+    MU_Y_RESTART_RATIO = 1,
+    RESTART_SPEED_MAX = 1.2,
+    ROLLING_SPEED_MIN = 6.7,
+    LONGITUDINAL_STIFFNESS = 160000,
+    LATERAL_STIFFNESS = 110000,
+    LATERAL_STIFFNESS_LOAD = -0.25,
+    CONTACT_HALF_LENGTH = 0.045,
+    CARCASS_TIME_CONSTANT = 0.003,
+    MZ_TRAIL_SCALE = 1.0,
+    MZ_CAMBER = 0,
+    MZ_CAMBER_LOAD = 0,
+    road(N = 4, seed = 1, n_min = 0.02, n_max = 3.0, roughness = 0)
+  ) {^tire}
+  mount = MultibodyComponents.FixedTranslation(r = [0, 0, unloaded_radius - static_deflection], render = false) {^mount}
+  carriage = MultibodyComponents.Prismatic(n = [1, 0, 0], render = false) {^carriage}
+  carriage_position = TranslationalComponents.Sources.Position(ref_type = TranslationalComponents.Sources.ReferenceType.Exact()) {^carriage_position}
+  vertical = MultibodyComponents.Prismatic(n = [0, 0, 1], render = false) {^vertical}
+  vertical_position = TranslationalComponents.Sources.Position(ref_type = TranslationalComponents.Sources.ReferenceType.Exact()) {^vertical_position}
+  steer = MultibodyComponents.Revolute(n = [0, 0, 1], render = false) {^steer}
+  steer_position = RotationalComponents.Sources.Position(ref_type = RotationalComponents.Sources.ReferenceType.Exact()) {^steer_position}
+  incline = MultibodyComponents.FixedRotation(n = [1, 0, 0], angle = camber, render = false) {^incline}
+  spin = RotationalComponents.Sources.VelocitySource(ref_type = RotationalComponents.Sources.ReferenceType.Exact()) {^spin}
+  spin_ground = RotationalComponents.Components.Fixed() {^spin_ground}
+  
+  structural parameter left_tire::Boolean = true
+  
+  parameter unloaded_radius::Length = 0.20
+  parameter static_deflection::Length = 0.006
+  parameter speed::Velocity = 10
+  parameter acceleration::Acceleration = 0
+  parameter stroke::Length = 0
+  parameter freq::Frequency = 1
+  parameter camber::Angle = 0
+  parameter alpha_start::Angle = 0
+  parameter alpha_end::Angle = 0
+  parameter kappa_start::Real = 0
+  parameter kappa_end::Real = 0
+  parameter spin_excess::Velocity = 0
+  parameter ramp_start::Time = 0
+  parameter ramp_time::Time = 1
+  
+  variable phase::Real
+  variable blend::Real
+
+relations
+  
+  # A smooth finite ramp holds both endpoints; the last part is steady rolling.
+  phase = min(max((time - ramp_start) / ramp_time, 0), 1)
+  blend = phase ^ 2 * (3 - 2 * phase)
+  carriage_position.s_ref = speed * time + 0.5 * acceleration * time ^ 2
+  vertical_position.s_ref = stroke * sin(2 * π * freq * time)
+  steer_position.phi_ref = -(alpha_start + (alpha_end - alpha_start) * blend)
+  
+  # 4.E5. The spindle uses the measured hub velocity and effective radius.
+  spin.w_ref = (tire.V_x + abs(tire.V_x) * (kappa_start + (kappa_end - kappa_start) * blend) + spin_excess) / tire.Re
+  
+  initial spin.phi = 0
+  
+  connect(world.frame_b, mount.frame_a) {^id13}
+  connect(mount.frame_b, carriage.frame_a) {^id14}
+  connect(carriage.support, carriage_position.support) {^id15}
+  connect(carriage_position.flange, carriage.axis) {^id16}
+  connect(carriage.frame_b, vertical.frame_a) {^id17}
+  connect(vertical.support, vertical_position.support) {^id18}
+  connect(vertical_position.flange, vertical.axis) {^id19}
+  connect(vertical.frame_b, steer.frame_a) {^id20}
+  connect(steer.support, steer_position.support) {^id21}
+  connect(steer_position.spline, steer.axis) {^id22}
+  connect(steer.frame_b, incline.frame_a) {^id23}
+  connect(incline.frame_b, tire.wheel_center) {^id24}
+  connect(spin.spline, tire.spline) {^id25}
+  connect(spin_ground.spline, spin.support) {^id26}
+
+metadata {
+  "Dyad": {
+    "tests": {
+      "combined": {
+        "stop": 0.4,
+        "params": {
+          "alpha_start": 0.05235987756,
+          "alpha_end": 0.05235987756,
+          "kappa_start": 0.08,
+          "kappa_end": 0.08
+        },
+        "atol": {"tire.Fx": 0.2, "tire.Fy": 0.2, "tire.Fz": 0.05, "tire.Mz": 0.01},
+        "expect": {"signals": ["tire.Fx", "tire.Fy", "tire.Fz", "tire.Mz"]}
+      },
+      "cambered_coupling": {
+        "stop": 0.4,
+        "params": {
+          "alpha_start": 0.05,
+          "alpha_end": 0.05,
+          "kappa_start": -0.08,
+          "kappa_end": 0.08,
+          "ramp_start": 0.05,
+          "ramp_time": 0.10,
+          "camber": 0.035,
+          "static_deflection": 0.008,
+          "tire.K_X_DIRECTION": 0.08,
+          "tire.K_Y_CAMBER": -1.1,
+          "tire.MU_X_CAMBER": -4,
+          "tire.MU_Y_CAMBER": -10,
+          "tire.MU_Y_DIRECTION": 0.01,
+          "tire.CAMBER_GAIN_LOAD": -0.05,
+          "tire.LATERAL_SLIP_BIAS": 0.001,
+          "tire.COMBINED_Y_LOSS": 0.20,
+          "tire.MZ_TRAIL_RATE": 14,
+          "tire.MZ_STIFFNESS_LOAD": 0.3,
+          "tire.MZ_SLIDING_ARM": 0.35,
+          "tire.MZ_RESIDUAL_RATE": 4
+        },
+        "atol": {"tire.Fx": 0.2, "tire.Fy": 0.2, "tire.Mz": 0.01},
+        "expect": {"signals": ["tire.Fx", "tire.Fy", "tire.Mz"]}
+      },
+      "spin_at_rest": {
+        "stop": 0.2,
+        "params": {"speed": 0, "spin_excess": 1.0},
+        "atol": {"tire.Fx": 0.2, "tire.Fy": 0.2},
+        "expect": {"signals": ["tire.Fx", "tire.Fy"]}
+      }
+    }
+  },
+  "_links": {
+    "world": {"Dyad": {"placement": {"diagram": {"x1": 0, "x2": 100, "y1": 0, "y2": 100}}}},
+    "tire": {
+      "Dyad": {"placement": {"diagram": {"x1": 770, "x2": 870, "y1": 450, "y2": 550}}}
+    },
+    "mount": {
+      "Dyad": {"placement": {"diagram": {"x1": 130, "x2": 230, "y1": 450, "y2": 550}}}
+    },
+    "carriage": {
+      "Dyad": {"placement": {"diagram": {"x1": 260, "x2": 360, "y1": 450, "y2": 550}}}
+    },
+    "carriage_position": {
+      "Dyad": {"placement": {"diagram": {"x1": 190, "x2": 290, "y1": 320, "y2": 420}}}
+    },
+    "vertical": {
+      "Dyad": {"placement": {"diagram": {"x1": 400, "x2": 500, "y1": 450, "y2": 550}}}
+    },
+    "vertical_position": {
+      "Dyad": {"placement": {"diagram": {"x1": 330, "x2": 430, "y1": 320, "y2": 420}}}
+    },
+    "steer": {
+      "Dyad": {"placement": {"diagram": {"x1": 530, "x2": 630, "y1": 450, "y2": 550}}}
+    },
+    "steer_position": {
+      "Dyad": {"placement": {"diagram": {"x1": 490, "x2": 590, "y1": 320, "y2": 420}}}
+    },
+    "incline": {
+      "Dyad": {"placement": {"diagram": {"x1": 650, "x2": 750, "y1": 450, "y2": 550}}}
+    },
+    "spin": {
+      "Dyad": {"placement": {"diagram": {"x1": 950, "x2": 1050, "y1": 450, "y2": 550}}}
+    },
+    "spin_ground": {
+      "Dyad": {"placement": {"diagram": {"x1": 950, "x2": 1050, "y1": 590, "y2": 690}}}
+    },
+    "id13": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 120, "y": 50}, {"x": 120, "y": 500}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id14": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id15": {"Dyad": {"edges": [{"S": 1, "M": [{"x": 240, "y": 550}], "E": 2}], "path": {}}},
+    "id16": {"Dyad": {"edges": [{"S": 1, "M": [{"x": 310, "y": 370}], "E": 2}], "path": {}}},
+    "id17": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id18": {"Dyad": {"edges": [{"S": 1, "M": [{"x": 380, "y": 550}], "E": 2}], "path": {}}},
+    "id19": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 430, "y": 400}, {"x": 450, "y": 400}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id20": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id21": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 545, "y": 460}, {"x": 540, "y": 460}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id22": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 590, "y": 435}, {"x": 580, "y": 435}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id23": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id24": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id25": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id26": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}}
+  }
+}
+end
