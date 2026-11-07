@@ -50,7 +50,9 @@ jobs:
       matrix:
         file:
           - test/damper_maps.jl
+          - test/hub_motor.jl
           - generated/DamperTestRig_test.jl
+          - generated/HubMotorTestRig_test.jl
           - generated/FullVehicleTestConstantSteer_test.jl
           - generated/FullVehicleTestInertiaPitch_test.jl
           - generated/FullVehicleTestInertiaRoll_test.jl

@@ -1,9 +1,11 @@
 connector HubMotorOutputs
-  output full_demand_power::Real(units = "W")
+  output motor_speed::AngularVelocity
+  output available_torque::Torque
+  output electrical_power::Power
   output omega::AngularVelocity
   output tau_motor::Torque
   output tau_wheel::Torque
-  output power::Power
+  output shaft_power::Power
 metadata {
   "Dyad": {
     "icons": {

@@ -1,15 +1,17 @@
 connector CornerAssemblyOutputs
   output slip::Real(units = "1")
-  output full_demand_power::Real(units = "W")
   output Fx::Force
   output Fy::Force
   output Fz::Force
   output alpha::Angle
   output omega::AngularVelocity
   output Re::Length
+  output motor_speed::AngularVelocity
+  output available_torque::Torque
+  output electrical_power::Power
   output tau_motor::Torque
   output tau_wheel::Torque
-  output power::Power
+  output shaft_power::Power
   output tau_brake::Torque
 metadata {
   "Dyad": {

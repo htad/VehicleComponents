@@ -5,10 +5,14 @@ connector VehicleControlInputs
   input slip_fr::Real(units = "1")
   input slip_rl::Real(units = "1")
   input slip_rr::Real(units = "1")
-  input full_demand_power_fl::Real(units = "W")
-  input full_demand_power_fr::Real(units = "W")
-  input full_demand_power_rl::Real(units = "W")
-  input full_demand_power_rr::Real(units = "W")
+  input motor_speed_fl::AngularVelocity
+  input available_torque_fl::Torque
+  input motor_speed_fr::AngularVelocity
+  input available_torque_fr::Torque
+  input motor_speed_rl::AngularVelocity
+  input available_torque_rl::Torque
+  input motor_speed_rr::AngularVelocity
+  input available_torque_rr::Torque
 metadata {
   "Dyad": {
     "icons": {

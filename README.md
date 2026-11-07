@@ -44,6 +44,18 @@ All four wheels load `assets/TestTire.toml` by default. To use the Hoosier R20, 
 
 Select damper compression/extension CSVs independently, e.g. `heave_VC03_extension_07.csv`. Files use m/s and N; the loader converts published force signs. Source: Multimatic DSSV Valve Code Offerings, 2022-04-25.
 
+## Hub motors
+
+Set `motor_type` once at the top of the vehicle TOML to `"AMK"` (default), `"F-MOT"`, or `"MRM"`. The selected map supplies the available shaft torque at each speed.
+
+### Calibration sources
+
+| Motor | Torque envelope and losses |
+| --- | --- |
+| AMK | Fixed A2370DD 100 °C map. At each speed, follow the increasing shaft-torque branch as current rises. Interpolate the zero-shaft-torque point. Use total loss minus mechanical loss. |
+| F-MOT | Use the field-weakening workbook's peak feasible torque at each RMS current and speed. Infer the least current required for a requested torque, then add the separate iron and conductive losses. The zero-torque field-weakening boundary is estimated from the last two available angle samples. The copper data ends at 65 A, so the 66 A point uses the 65 A loss scaled by current squared. |
+| MRM | Use the 66 A, 424 V line-to-line RMS performance export at 20 °C. Use `torqueCurve` and the feasible `lossMap` cells, with `lossCurve` at full torque. The repeated 20,000 rpm point closes the plotted outline. The powered endpoint is 20.953 N·m. |
+
 ## Dyad Conventions
 
 ### Variable Type

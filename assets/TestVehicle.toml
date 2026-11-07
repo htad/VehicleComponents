@@ -1,5 +1,8 @@
 vehicle_name = "TestVehicle"
 
+motor_type = "AMK"
+gear_ratio = 14.0
+
 road_N = 64
 road_seed = 1
 road_n_min = 0.02
@@ -38,10 +41,6 @@ tire_inertia = 0.736
 [corner_fl.wheel_assembly.tire.road]
 roughness = 0.0
 
-[corner_fl.motor]
-gear_ratio = 14.0
-max_torque = 21.0
-
 [corner_fr]
 upright_mass = 5.0
 
@@ -56,10 +55,6 @@ tire_inertia = 0.736
 
 [corner_fr.wheel_assembly.tire.road]
 roughness = 0.0
-
-[corner_fr.motor]
-gear_ratio = 14.0
-max_torque = 21.0
 
 [corner_rl]
 upright_mass = 5.0
@@ -76,10 +71,6 @@ tire_inertia = 0.736
 [corner_rl.wheel_assembly.tire.road]
 roughness = 0.0
 
-[corner_rl.motor]
-gear_ratio = 14.0
-max_torque = 21.0
-
 [corner_rr]
 upright_mass = 5.0
 
@@ -94,10 +85,6 @@ tire_inertia = 0.736
 
 [corner_rr.wheel_assembly.tire.road]
 roughness = 0.0
-
-[corner_rr.motor]
-gear_ratio = 14.0
-max_torque = 21.0
 
 [front_suspension]
 wheel_center_left = [0.0, 0.6, 0.3135]

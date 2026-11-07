@@ -13,11 +13,13 @@
   """))
   __params = Symbolics.SymbolicT[]
   __vars = @variables begin
-    (full_demand_power(t)::Real), [output = true]
+    (motor_speed(t)::Real), [output = true]
+    (available_torque(t)::Real), [output = true]
+    (electrical_power(t)::Real), [output = true]
     (omega(t)::Real), [output = true]
     (tau_motor(t)::Real), [output = true]
     (tau_wheel(t)::Real), [output = true]
-    (power(t)::Real), [output = true]
+    (shaft_power(t)::Real), [output = true]
   end
   __metadata = Dict{DataType, Any}(
   )

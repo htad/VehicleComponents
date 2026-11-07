@@ -5,12 +5,13 @@
 
 
 @doc Markdown.doc"""
-   VehicleControl(; name, total_max_power, __overrides)
+   VehicleControl(; name, motor_type, total_max_power, __overrides)
 
 ## Parameters:
 
 | Name         | Description                         | Units  |   Default value |
 | ------------ | ----------------------------------- | ------ | --------------- |
+| `motor_type`         |                          | --  |    |
 | `total_max_power`         |                          | W  |    |
 
 ## Connectors
@@ -22,10 +23,9 @@
 
 | Name         | Description                         | Units  | 
 | ------------ | ----------------------------------- | ------ |
-| `requested_power`         |                          | W  |
 | `power_scale`         |                          | --  |
 """
-@component function VehicleControl(; name = nothing, var"total_max_power"=nothing, __overrides = Dict{String, Any}())
+@component function VehicleControl(; name = nothing, var"motor_type"=nothing, var"total_max_power"=nothing, __overrides = Dict{String, Any}())
   isnothing(name) && throw(ArgumentError("""
     The `name` keyword must be provided. Please consider using the `@named` macro,
     like so:
@@ -44,6 +44,7 @@
   __bindings = Dict{Symbolics.SymbolicT, Symbolics.SymbolicT}()
 
   ### Keyword argument overrides
+  haskey(__overrides, "motor_type") && (motor_type = pop!(__overrides, "motor_type"))
   haskey(__overrides, "total_max_power") && (total_max_power = pop!(__overrides, "total_max_power"))
 
   ### Structural Parameters (functions)
@@ -68,13 +69,9 @@
   ### Final Path Parameters
 
   ### Variables (declarations)
-  append!(__vars, @variables (requested_power(t)::Real))
   append!(__vars, @variables (power_scale(t)::Real))
 
   ### Variables (assignments)
-  __ovr_requested_power = pop!(__overrides, "requested_power", nothing); isnothing(__ovr_requested_power) || push!(__eqs, requested_power ~ __ovr_requested_power)
-  __ovr_requested_power__initial = pop!(__overrides, "requested_power.initial", nothing); isnothing(__ovr_requested_power__initial) || (__initial_conditions[requested_power] = __ovr_requested_power__initial)
-  __ovr_requested_power__guess = pop!(__overrides, "requested_power.guess", nothing)
   __ovr_power_scale = pop!(__overrides, "power_scale", nothing); isnothing(__ovr_power_scale) || push!(__eqs, power_scale ~ __ovr_power_scale)
   __ovr_power_scale__initial = pop!(__overrides, "power_scale.initial", nothing); isnothing(__ovr_power_scale__initial) || (__initial_conditions[power_scale] = __ovr_power_scale__initial)
   __ovr_power_scale__guess = pop!(__overrides, "power_scale.guess", nothing)
@@ -96,7 +93,6 @@
   isempty(__overrides) || throw(ArgumentError("overrides: [$(join(keys(__overrides), ", "))] don't match names found in model. These names may exist in the model but could have been conditionally excluded. Override keys are dotted paths as written in Dyad source (e.g. inner.rate)."))
 
   ### Guesses
-  isnothing(__ovr_requested_power__guess) || (__guesses[requested_power] = __ovr_requested_power__guess)
   isnothing(__ovr_power_scale__guess) || (__guesses[power_scale] = __ovr_power_scale__guess)
 
   ### Initialization Equations
@@ -122,8 +118,7 @@
   push!(__eqs, outputs.demand_rl ~ tc.outputs.demand_rl * power_scale)
   push!(__eqs, outputs.demand_rr ~ tc.outputs.demand_rr * power_scale)
   push!(__eqs, outputs.brake_demand ~ abs.outputs.brake_demand)
-  push!(__eqs, requested_power ~ tc.outputs.demand_fl * inputs.full_demand_power_fl + tc.outputs.demand_fr * inputs.full_demand_power_fr + tc.outputs.demand_rl * inputs.full_demand_power_rl + tc.outputs.demand_rr * inputs.full_demand_power_rr)
-  push!(__eqs, power_scale ~ ifelse(requested_power > total_max_power, total_max_power / requested_power, 1))
+  push!(__eqs, power_scale ~ VehicleComponents.motor_power_scale(motor_type, total_max_power, [inputs.motor_speed_fl, inputs.motor_speed_fr, inputs.motor_speed_rl, inputs.motor_speed_rr], [tc.outputs.demand_fl * inputs.available_torque_fl, tc.outputs.demand_fr * inputs.available_torque_fr, tc.outputs.demand_rl * inputs.available_torque_rl, tc.outputs.demand_rr * inputs.available_torque_rr]))
 
   # Return completely constructed System
   return System(__eqs, ModelingToolkit.t_nounits, __vars, __params; systems=__systems, initial_conditions=__initial_conditions, guesses=__guesses, name, initialization_eqs=__initialization_eqs, bindings=__bindings, assertions=__assertions)

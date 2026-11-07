@@ -17,10 +17,6 @@ prob = ODEProblem(ssys, [
     ssys.steer_angle => steer_angle,
     ssys.throttle.height => 0.1,
     ssys.throttle.duration => 22.5,
-    ssys.vehicle.corner_fl.motor.max_torque => 3,
-    ssys.vehicle.corner_fr.motor.max_torque => 3,
-    ssys.vehicle.corner_rl.motor.max_torque => 3,
-    ssys.vehicle.corner_rr.motor.max_torque => 3,
 ], (0.0, t_end); guesses=[D(D(ssys.vehicle.body.r_0[i])) => 0.0 for i in 1:3])
 sol = solve(prob, Rodas5P(autodiff=AutoFiniteDiff()); tstops=[t_drive, t_steer])
 
