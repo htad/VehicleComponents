@@ -19,10 +19,14 @@
     (slip_fr(t)::Real), [input = true]
     (slip_rl(t)::Real), [input = true]
     (slip_rr(t)::Real), [input = true]
-    (full_demand_power_fl(t)::Real), [input = true]
-    (full_demand_power_fr(t)::Real), [input = true]
-    (full_demand_power_rl(t)::Real), [input = true]
-    (full_demand_power_rr(t)::Real), [input = true]
+    (motor_speed_fl(t)::Real), [input = true]
+    (available_torque_fl(t)::Real), [input = true]
+    (motor_speed_fr(t)::Real), [input = true]
+    (available_torque_fr(t)::Real), [input = true]
+    (motor_speed_rl(t)::Real), [input = true]
+    (available_torque_rl(t)::Real), [input = true]
+    (motor_speed_rr(t)::Real), [input = true]
+    (available_torque_rr(t)::Real), [input = true]
   end
   __metadata = Dict{DataType, Any}(
   )

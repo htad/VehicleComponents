@@ -37,258 +37,99 @@ relations
   brake.inputs.brake_demand = inputs.brake_demand
 
   # Outputs
+  outputs.slip = wheel_assembly.outputs.slip
   outputs.Fx = wheel_assembly.outputs.Fx
   outputs.Fy = wheel_assembly.outputs.Fy
   outputs.Fz = wheel_assembly.outputs.Fz
   outputs.alpha = wheel_assembly.outputs.alpha
   outputs.omega = wheel_assembly.outputs.omega
   outputs.Re = wheel_assembly.outputs.Re
-  outputs.slip = wheel_assembly.outputs.slip
+  outputs.motor_speed = motor.outputs.motor_speed
+  outputs.available_torque = motor.outputs.available_torque
+  outputs.electrical_power = motor.outputs.electrical_power
   outputs.tau_motor = motor.outputs.tau_motor
   outputs.tau_wheel = motor.outputs.tau_wheel
-  outputs.power = motor.outputs.power
-  outputs.full_demand_power = motor.outputs.full_demand_power
+  outputs.shaft_power = motor.outputs.shaft_power
   outputs.tau_brake = brake.outputs.tau_brake
 
   # Connections
-  connect(wheel_center, wheel_assembly.wheel_center) {^id10}
-  connect(wheel_center, upright.frame_a) {^id11}
-  connect(motor.wheel_center, wheel_center) {^id12}
-  connect(wheel_assembly.spline, motor.spline) {^id13}
-  connect(wheel_assembly.spline, brake.spline) {^id17}
-  connect(brake.wheel_center, wheel_center) {^id19}
+  connect(wheel_center, wheel_assembly.wheel_center) {^id11}
+  connect(wheel_center, upright.frame_a) {^id12}
+  connect(motor.wheel_center, wheel_center) {^id13}
+  connect(wheel_assembly.spline, motor.spline) {^id14}
+  connect(wheel_assembly.spline, brake.spline) {^id15}
+  connect(brake.wheel_center, wheel_center) {^id16}
 
 metadata {
+  "Dyad": {"labels": [{"label": "$(instance)", "x": 500, "y": 1100, "layer": "icon"}]},
   "_links": {
-    "wheel_center": {
-      "Dyad": {
-        "placement": {
-          "diagram": {
-            "x1": -40,
-            "x2": 60,
-            "y1": 450,
-            "y2": 550
-          },
-          "icon": {
-            "x1": -40,
-            "x2": 60,
-            "y1": 450,
-            "y2": 550
-          }
-        }
-      }
-    },
-    "wheel_assembly": {
-      "Dyad": {
-        "placement": {
-          "diagram": {
-            "x1": 450,
-            "x2": 550,
-            "y1": 450,
-            "y2": 550
-          }
-        }
-      }
-    },
-    "motor": {
-      "Dyad": {
-        "placement": {
-          "diagram": {
-            "x1": 450,
-            "x2": 550,
-            "y1": 310,
-            "y2": 410
-          }
-        }
-      }
-    },
-    "brake": {
-      "Dyad": {
-        "placement": {
-          "diagram": {
-            "x1": 450,
-            "x2": 550,
-            "y1": 620,
-            "y2": 720
-          }
-        }
-      }
-    },
-    "upright": {
-      "Dyad": {
-        "placement": {
-          "diagram": {
-            "x1": 450,
-            "x2": 550,
-            "y1": 130,
-            "y2": 230
-          }
-        }
-      }
-    },
-    "id10": {
-      "Dyad": {
-        "edges": [
-          {
-            "S": 1,
-            "M": [],
-            "E": 2
-          }
-        ],
-        "path": {}
-      }
-    },
-    "id11": {
-      "Dyad": {
-        "edges": [
-          {
-            "S": 1,
-            "M": [
-              {
-                "x": 170,
-                "y": 500
-              },
-              {
-                "x": 170,
-                "y": 180
-              }
-            ],
-            "E": 2
-          }
-        ],
-        "path": {}
-      }
-    },
-    "id12": {
-      "Dyad": {
-        "edges": [
-          {
-            "S": 1,
-            "M": [
-              {
-                "x": 170,
-                "y": 359
-              },
-              {
-                "x": 170,
-                "y": 500
-              }
-            ],
-            "E": 2
-          }
-        ],
-        "path": {}
-      }
-    },
-    "id13": {
-      "Dyad": {
-        "edges": [
-          {
-            "S": 1,
-            "M": [
-              {
-                "x": 590,
-                "y": 500
-              },
-              {
-                "x": 590,
-                "y": 360
-              }
-            ],
-            "E": 2
-          }
-        ],
-        "path": {}
-      }
-    },
-    "id17": {
-      "Dyad": {
-        "edges": [
-          {
-            "S": 1,
-            "M": [
-              {
-                "x": 590,
-                "y": 500
-              },
-              {
-                "x": 590,
-                "y": 670
-              }
-            ],
-            "E": 2
-          }
-        ],
-        "path": {}
-      }
-    },
-    "id19": {
-      "Dyad": {
-        "edges": [
-          {
-            "S": 1,
-            "M": [
-              {
-                "x": 170,
-                "y": 669
-              },
-              {
-                "x": 170,
-                "y": 500
-              }
-            ],
-            "E": 2
-          }
-        ],
-        "path": {}
-      }
-    },
     "inputs": {
       "Dyad": {
         "placement": {
-          "diagram": {
-            "x1": -50,
-            "x2": 50,
-            "y1": 20,
-            "y2": 120
-          },
-          "icon": {
-            "x1": -50.0,
-            "y1": 100.0,
-            "x2": 50.0,
-            "y2": 200.0
-          }
+          "diagram": {"x1": -50, "x2": 50, "y1": 20, "y2": 120},
+          "icon": {"x1": -50.0, "y1": 100.0, "x2": 50.0, "y2": 200.0}
         }
       }
     },
     "outputs": {
       "Dyad": {
         "placement": {
-          "diagram": {
-            "x1": 950,
-            "x2": 1050,
-            "y1": 20,
-            "y2": 120
-          },
-          "icon": {
-            "x1": 950.0,
-            "y1": 100.0,
-            "x2": 1050.0,
-            "y2": 200.0
-          }
+          "diagram": {"x1": 950, "x2": 1050, "y1": 10, "y2": 110},
+          "icon": {"x1": 950.0, "y1": 100.0, "x2": 1050.0, "y2": 200.0}
         }
       }
-    }
-  },
-  "Dyad": {
-    "labels": [
-      {
-        "label": "$(instance)",
-        "x": 500,
-        "y": 1100,
-        "layer": "icon"
+    },
+    "wheel_center": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"x1": -40, "x2": 60, "y1": 450, "y2": 550},
+          "icon": {"x1": -40, "x2": 60, "y1": 450, "y2": 550}
+        }
       }
-    ]
+    },
+    "wheel_assembly": {
+      "Dyad": {"placement": {"diagram": {"x1": 450, "x2": 550, "y1": 450, "y2": 550}}}
+    },
+    "motor": {
+      "Dyad": {"placement": {"diagram": {"x1": 450, "x2": 550, "y1": 310, "y2": 410}}}
+    },
+    "brake": {
+      "Dyad": {"placement": {"diagram": {"x1": 450, "x2": 550, "y1": 600, "y2": 700}}}
+    },
+    "upright": {
+      "Dyad": {"placement": {"diagram": {"x1": 450, "x2": 550, "y1": 130, "y2": 230}}}
+    },
+    "id11": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id12": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 170, "y": 500}, {"x": 170, "y": 180}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id13": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 170, "y": 359}, {"x": 170, "y": 500}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id14": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 590, "y": 500}, {"x": 590, "y": 360}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id15": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 590, "y": 500}, {"x": 590, "y": 650}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id16": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 170, "y": 649}, {"x": 170, "y": 500}], "E": 2}],
+        "path": {}
+      }
+    }
   }
 }
 end

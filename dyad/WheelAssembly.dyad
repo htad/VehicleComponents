@@ -6,7 +6,7 @@ component WheelAssembly
   and the tire inertias are collected here into a single `spin` inertia.
   """
 
-  outputs = WheelAssemblyOutputs() {^outputs}
+  outputs = TireMF61Outputs() {^outputs}
 
   spline = Dyad.Spline() {^spline}
   wheel_center = Dyad.Frame3D() {^wheel_center}
@@ -34,13 +34,7 @@ component WheelAssembly
 relations
 
   # Outputs
-  outputs.Fx = tire.outputs.Fx
-  outputs.Fy = tire.outputs.Fy
-  outputs.Fz = tire.outputs.Fz
-  outputs.alpha = tire.outputs.alpha
-  outputs.omega = tire.outputs.omega
-  outputs.Re = tire.outputs.Re
-  outputs.slip = tire.outputs.slip
+  connect(outputs, tire.outputs)
 
   # Connections
   connect(wheel_center, tire.wheel_center) {^id7}
