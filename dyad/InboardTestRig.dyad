@@ -37,12 +37,12 @@ test component InboardTestRig
       )
     ),
     heave_dataset = VehicleComponents.damper_dataset(
-      "dampers/heave_VC03_compression_02.csv",
-      "dampers/heave_VC03_extension_02.csv"
+      "public/dampers/heave_VC03_compression_02.csv",
+      "public/dampers/heave_VC03_extension_02.csv"
     ),
     roll_dataset = VehicleComponents.damper_dataset(
-      "dampers/roll_VC01_compression_03.csv",
-      "dampers/roll_VC01_extension_03.csv"
+      "public/dampers/roll_VC01_compression_03.csv",
+      "public/dampers/roll_VC01_extension_03.csv"
     ),
     pushrod_adjust_left = 0.0,
     pushrod_adjust_right = 0.0

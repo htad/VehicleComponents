@@ -81,7 +81,7 @@
   push!(__systems, @named top = MultibodyComponents.Fixed(; r=[Float64(0), Float64(0), damper_length], render=false, __overrides = top_overrides))
   # Subcomponent damper of type VehicleComponents.Damper
   damper_overrides = __pop_subcomponent_overrides!(__overrides, "damper")
-  push!(__systems, @named damper = VehicleComponents.Damper(; dataset=VehicleComponents.damper_dataset("dampers/heave_VC03_compression_02.csv", "dampers/heave_VC03_extension_02.csv"), __overrides = damper_overrides))
+  push!(__systems, @named damper = VehicleComponents.Damper(; dataset=VehicleComponents.damper_dataset("public/dampers/heave_VC03_compression_02.csv", "public/dampers/heave_VC03_extension_02.csv"), __overrides = damper_overrides))
   # Subcomponent base of type MultibodyComponents.Fixed
   base_overrides = __pop_subcomponent_overrides!(__overrides, "base")
   push!(__systems, @named base = MultibodyComponents.Fixed(; r=[Float64(0), Float64(0), Float64(0)], render=false, __overrides = base_overrides))
