@@ -24,7 +24,7 @@ component HubMotor
   wheel_center = Dyad.Frame3D() {^wheel_center}
   spline = Dyad.Spline() {^spline}
 
-  structural parameter motor_type::String
+  structural parameter motor_map_file::String
 
   parameter gear_ratio::Real
 
@@ -32,11 +32,11 @@ relations
 
   outputs.omega = der(spline.phi)
   outputs.motor_speed = outputs.omega * gear_ratio
-  outputs.available_torque = VehicleComponents.motor_torque_limit(motor_type, outputs.motor_speed)
+  outputs.available_torque = VehicleComponents.motor_torque_limit(motor_map_file, outputs.motor_speed)
   outputs.tau_motor = min(1, max(0, inputs.demand)) * outputs.available_torque
   outputs.tau_wheel = outputs.tau_motor * gear_ratio
   outputs.shaft_power = outputs.tau_motor * outputs.motor_speed
-  outputs.electrical_power = VehicleComponents.motor_input_power(motor_type, outputs.motor_speed, outputs.tau_motor)
+  outputs.electrical_power = VehicleComponents.motor_input_power(motor_map_file, outputs.motor_speed, outputs.tau_motor)
 
   spline.tau = -outputs.tau_wheel
   wheel_center.f = [0, 0, 0]
@@ -46,7 +46,7 @@ metadata {
   "Dyad": {
     "panel": {
       "control": "tabs",
-      "children": {"Motor": {"contents": ["motor_type", "gear_ratio"]}}
+      "children": {"Motor": {"contents": ["motor_map_file", "gear_ratio"]}}
     },
     "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "layer": "icon"}]
   },

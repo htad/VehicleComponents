@@ -5,19 +5,19 @@
 
 
 @doc Markdown.doc"""
-   HubMotorTestRig(; name, motor_type, gear_ratio, demand, sweep_duration, final_motor_speed, __overrides)
+   HubMotorTestRig(; name, motor_map_file, gear_ratio, demand, sweep_duration, final_motor_speed, __overrides)
 
 ## Parameters:
 
 | Name         | Description                         | Units  |   Default value |
 | ------------ | ----------------------------------- | ------ | --------------- |
-| `motor_type`         |                          | --  |   "AMK" |
+| `motor_map_file`         |                          | --  |   "public/motors/AMK.csv" |
 | `gear_ratio`         |                          | --  |   14 |
 | `demand`         |                          | --  |   1 |
 | `sweep_duration`         |                          | s  |   1 |
 | `final_motor_speed`         |                          | rad/s  |   22000 * π / 30 |
 """
-@component function HubMotorTestRig(; name = nothing, var"motor_type"="AMK", var"gear_ratio"=Float64(14), var"demand"=Float64(1), var"sweep_duration"=Float64(1), var"final_motor_speed"=22000 * π / 30, __overrides = Dict{String, Any}())
+@component function HubMotorTestRig(; name = nothing, var"motor_map_file"="public/motors/AMK.csv", var"gear_ratio"=Float64(14), var"demand"=Float64(1), var"sweep_duration"=Float64(1), var"final_motor_speed"=22000 * π / 30, __overrides = Dict{String, Any}())
   isnothing(name) && throw(ArgumentError("""
     The `name` keyword must be provided. Please consider using the `@named` macro,
     like so:
@@ -36,7 +36,7 @@
   __bindings = Dict{Symbolics.SymbolicT, Symbolics.SymbolicT}()
 
   ### Keyword argument overrides
-  haskey(__overrides, "motor_type") && (motor_type = pop!(__overrides, "motor_type"))
+  haskey(__overrides, "motor_map_file") && (motor_map_file = pop!(__overrides, "motor_map_file"))
   haskey(__overrides, "gear_ratio") && (gear_ratio = pop!(__overrides, "gear_ratio"))
   haskey(__overrides, "demand") && (demand = pop!(__overrides, "demand"))
   haskey(__overrides, "sweep_duration") && (sweep_duration = pop!(__overrides, "sweep_duration"))
@@ -85,7 +85,7 @@
   push!(__systems, @named world = MultibodyComponents.World(; n=[Float64(0), Float64(0), Float64(-1)], render=false, __symbol_overrides(world_overrides)...))
   # Subcomponent motor of type VehicleComponents.HubMotor
   motor_overrides = __pop_subcomponent_overrides!(__overrides, "motor")
-  push!(__systems, @named motor = VehicleComponents.HubMotor(; motor_type=motor_type, gear_ratio=gear_ratio, __overrides = motor_overrides))
+  push!(__systems, @named motor = VehicleComponents.HubMotor(; motor_map_file=motor_map_file, gear_ratio=gear_ratio, __overrides = motor_overrides))
   # Subcomponent ground of type RotationalComponents.Components.Fixed
   ground_overrides = __pop_subcomponent_overrides!(__overrides, "ground")
   push!(__systems, @named ground = RotationalComponents.Components.Fixed(; __overrides = ground_overrides))

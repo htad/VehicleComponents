@@ -7,7 +7,7 @@ component VehicleControl
   tc = VehicleComponents.TorqueControlLaunch() {^tc}
   abs = VehicleComponents.ABSControl() {^abs}
 
-  structural parameter motor_type::String
+  structural parameter motor_map_file::String
 
   parameter total_max_power::Power
 
@@ -38,7 +38,7 @@ relations
 
   # Equations
   power_scale = VehicleComponents.motor_power_scale(
-    motor_type, total_max_power,
+    motor_map_file, total_max_power,
     [inputs.motor_speed_fl, inputs.motor_speed_fr, inputs.motor_speed_rl, inputs.motor_speed_rr],
     [tc.outputs.demand_fl * inputs.available_torque_fl, tc.outputs.demand_fr * inputs.available_torque_fr,
      tc.outputs.demand_rl * inputs.available_torque_rl, tc.outputs.demand_rr * inputs.available_torque_rr]

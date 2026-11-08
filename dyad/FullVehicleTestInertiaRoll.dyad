@@ -16,7 +16,7 @@ test component FullVehicleTestInertiaRoll
   brake = BlockComponents.Sources.Constant(k = 0.0) {^brake}
   steer = BlockComponents.Sources.Constant(k = 0.0) {^steer}
   vehicle = VehicleComponents.InertiaFixtureVehicle(
-    apply "dyad://VehicleComponents/TestVehicle.toml", 
+    apply "dyad://VehicleComponents/public/vehicles/Test.toml", 
     aero(CdA = 0.0, ClA = 0.0)
   ) {^vehicle}
 

@@ -144,7 +144,7 @@
   suspension_dict["inboard.roll_strut.spring.s_neutral"] = ModelingToolkit.default_to_parentscope(0.2283243)
   suspension_dict["inboard.roll_strut.spring.preload_travel"] = ModelingToolkit.default_to_parentscope(0.0)
   merge!(suspension_dict, suspension_overrides)
-  push!(__systems, @named suspension = VehicleComponents.Suspension(; wheel_center_left=wheel_center_left, wheel_center_right=wheel_center_right, pushrod_outer_left=pushrod_outer_left, pushrod_outer_right=pushrod_outer_right, tierod_inner_left=[0.08, 0.22, 0.2335], tierod_inner_right=[0.08, -0.22, 0.2335], heave_dataset=VehicleComponents.damper_dataset("dampers/heave_VC03_compression_02.csv", "dampers/heave_VC03_extension_02.csv"), roll_dataset=VehicleComponents.damper_dataset("dampers/roll_VC01_compression_03.csv", "dampers/roll_VC01_extension_03.csv"), __overrides = suspension_dict))
+  push!(__systems, @named suspension = VehicleComponents.Suspension(; wheel_center_left=wheel_center_left, wheel_center_right=wheel_center_right, pushrod_outer_left=pushrod_outer_left, pushrod_outer_right=pushrod_outer_right, tierod_inner_left=[0.08, 0.22, 0.2335], tierod_inner_right=[0.08, -0.22, 0.2335], heave_dataset=VehicleComponents.damper_dataset("public/dampers/heave_VC03_compression_02.csv", "public/dampers/heave_VC03_extension_02.csv"), roll_dataset=VehicleComponents.damper_dataset("public/dampers/roll_VC01_compression_03.csv", "public/dampers/roll_VC01_extension_03.csv"), __overrides = suspension_dict))
   # Subcomponent fixed_left of type MultibodyComponents.Fixed
   fixed_left_overrides = __pop_subcomponent_overrides!(__overrides, "fixed_left")
   push!(__systems, @named fixed_left = MultibodyComponents.Fixed(; r=base_left, render=false, __overrides = fixed_left_overrides))

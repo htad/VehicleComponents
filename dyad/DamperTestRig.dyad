@@ -11,8 +11,8 @@ test component DamperTestRig
   top = MultibodyComponents.Fixed(r = [0, 0, damper_length], render = false) {^top}
   damper = VehicleComponents.Damper(
     dataset = VehicleComponents.damper_dataset(
-      "dampers/heave_VC03_compression_02.csv",
-      "dampers/heave_VC03_extension_02.csv"
+      "public/dampers/heave_VC03_compression_02.csv",
+      "public/dampers/heave_VC03_extension_02.csv"
     )
   ) {^damper}
 

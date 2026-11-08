@@ -31,7 +31,7 @@ test component FullVehicleTestInertiaYaw
   # LKX also removes longitudinal slip stiffness. Keep LMUY nonzero because
   # the aligning-moment equations divide by it.
   vehicle = VehicleComponents.FullVehicle(
-    apply "dyad://VehicleComponents/TestVehicle.toml",
+    apply "dyad://VehicleComponents/public/vehicles/Test.toml",
     corner_fl(
       wheel_assembly(
         tire(

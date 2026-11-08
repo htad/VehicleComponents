@@ -18,7 +18,7 @@ test component FullVehicleTestStatic
   pitch_joint = MultibodyComponents.Revolute(n = [0, 1, 0], render = false) {^pitch_joint}
   
   vehicle = VehicleComponents.FullVehicle(
-    apply "dyad://VehicleComponents/TestVehicle.toml"
+    apply "dyad://VehicleComponents/public/vehicles/Test.toml"
   ) {^vehicle}
 
 relations

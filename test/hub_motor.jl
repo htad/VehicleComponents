@@ -2,15 +2,15 @@ using Test, VehicleComponents, ModelingToolkit, MultibodyComponents, OrdinaryDif
 using ADTypes: AutoFiniteDiff
 
 @testset "Hub motor dynamometer" begin
-    # Independent anchors from the source files. Each partial-load torque is
-    # a native sample. The corresponding loss omits mechanical losses.
+    # Source anchors at full and partial load. Each loss is winding plus iron.
     samples = (
-        ("AMK", 5000.0, 20.9916181227, 3076.22019851, 10.70320395, 644.12830939),
+        ("AMK", 5000.0, 20.9916181227, 2676.44195112 + 364.48709873,
+            10.70320395, 429.49230156 + 210.29459434),
         ("F-MOT", 5000.0, 31.5929981472, 101 + 1597*(66/65)^2, 10.64196, 101 + 168),
     )
     for (name, rpm, peak, peak_loss, partial, partial_loss) in samples
         @testset "$name" begin
-            @named model = HubMotorTestRig(motor_type=name)
+            @named model = HubMotorTestRig(motor_map_file="public/motors/$name.csv")
             sys = multibody(model)
             motor = sys.motor.outputs
             ω, τ, wheel, mechanical, electrical = (
@@ -35,40 +35,43 @@ end
     # Front motors above the map endpoint, rears inside it.
     speeds = [21000., 21000., 17500., 17500.] .* (π/30)
     for name in ("AMK", "F-MOT")
-        available = VehicleComponents.motor_torque_limit.(name, speeds)
+        file = "public/motors/$name.csv"
+        available = VehicleComponents.motor_torque_limit.(file, speeds)
         requests = [0.05, 0.05, 1., 1.] .* available
-        k = VehicleComponents.motor_power_scale(name, 80000., speeds, requests)
-        powers = VehicleComponents.motor_input_power.(name, speeds, k .* requests)
+        k = VehicleComponents.motor_power_scale(file, 80000., speeds, requests)
+        powers = VehicleComponents.motor_input_power.(file, speeds, k .* requests)
         @test 0 < k < 1
         @test 79999.99 <= sum(powers) <= 80000.000001
         @test powers[3] > 20000
-        @test VehicleComponents.motor_power_scale(name, 80000., speeds, requests/10) == 1
-        @test VehicleComponents.motor_input_power(name, 0., 0.) == 0
-        @test VehicleComponents.motor_input_power(name, speeds[1], 0.) > 0
+        @test VehicleComponents.motor_power_scale(file, 80000., speeds, requests/10) == 1
+        @test VehicleComponents.motor_input_power(file, 0., 0.) == 0
+        @test VehicleComponents.motor_input_power(file, speeds[1], 0.) > 0
     end
-    @test_throws ArgumentError VehicleComponents.motor_map("unknown")
+    @test_throws ArgumentError VehicleComponents.motor_map("public/motors/missing.csv")
 end
 
 @testset "Above the final mapped speed" begin
     for name in ("AMK", "F-MOT")
-        map = VehicleComponents.motor_map(name)
+        file = "public/motors/$name.csv"
+        map = VehicleComponents.motor_map(file)
         endpoint = last(map.rpm) * (π / 30)
         speed = 1.05 * endpoint
         curve = last(map.curves)
-        @test VehicleComponents.motor_torque_limit(name, speed) ≈ last(curve.torque)
+        @test VehicleComponents.motor_torque_limit(file, speed) ≈ last(curve.torque)
         for (torque, loss) in zip(curve.torque, curve.watts)
-            @test VehicleComponents.motor_input_power(name, speed, torque) ≈ speed * torque + loss
+            @test VehicleComponents.motor_input_power(file, speed, torque) ≈ speed * torque + loss
         end
     end
 end
 
 @testset "Native torque and loss map knots" begin
     for name in ("AMK", "F-MOT")
-        map = VehicleComponents.motor_map(name)
-        @test all(VehicleComponents.motor_torque_limit(name, rpm*π/30) ≈ last(curve.torque)
+        file = "public/motors/$name.csv"
+        map = VehicleComponents.motor_map(file)
+        @test all(VehicleComponents.motor_torque_limit(file, rpm*π/30) ≈ last(curve.torque)
                   for (rpm, curve) in zip(map.rpm, map.curves))
         error = maximum(
-            abs(VehicleComponents.motor_input_power(name, rpm*π/30, t) - t*rpm*π/30 - loss)
+            abs(VehicleComponents.motor_input_power(file, rpm*π/30, t) - t*rpm*π/30 - loss)
             for (rpm, curve) in zip(map.rpm, map.curves)
             for (t, loss) in zip(curve.torque, curve.watts)
         )
@@ -78,6 +81,6 @@ end
     rpm, torque = 14910., 26.869530831809485
     iron = 376 + (377 - 376) * (rpm - 14500) / 500
     copper = 1143 + (1360 - 1143) / 5
-    @test VehicleComponents.motor_input_power("F-MOT", rpm*π/30, torque) ≈
+    @test VehicleComponents.motor_input_power("public/motors/F-MOT.csv", rpm*π/30, torque) ≈
         torque*rpm*π/30 + iron + copper atol=0.01
 end

@@ -10,8 +10,10 @@ struct MotorMap
     curves::Vector{MotorLossCurve}
 end
 
-function read_motor_map(name)
-    path = joinpath(@__DIR__, "..", "assets", "motors", "$name.csv")
+"""Read a motor CSV from an assets-relative path or an absolute file path."""
+function read_motor_map(file::AbstractString)
+    path = joinpath(@__DIR__, "..", "assets", file)
+    isfile(path) || throw(ArgumentError("Motor map file not found: $path"))
     Base.include_dependency(path)
     rpm = Float64[]
     curves = MotorLossCurve[]
@@ -33,22 +35,13 @@ function read_motor_map(name)
     return MotorMap(rpm, curves)
 end
 
-const MOTOR_MAPS = let
-    directory = joinpath(@__DIR__, "..", "assets", "motors")
-    Base.include_dependency(directory)
-    maps = Dict(name => read_motor_map(name) for name in ("AMK", "F-MOT"))
-    if isfile(joinpath(directory, "MRM.csv"))
-        maps["MRM"] = read_motor_map("MRM")
-    end
-    maps
-end
+const MOTOR_MAPS = Dict{String,MotorMap}()
 
-function motor_map(name)
-    if name == "MRM" && !haskey(MOTOR_MAPS, name)
-        throw(ArgumentError("The MRM motor requires the private assets/motors/MRM.csv map."))
+function motor_map(file::AbstractString)
+    # Read only the selected CSV and reuse it during solver evaluations.
+    return get!(MOTOR_MAPS, file) do
+        read_motor_map(file)
     end
-    haskey(MOTOR_MAPS, name) || throw(ArgumentError("Unknown motor '$name'. Choose AMK, F-MOT, or MRM."))
-    return MOTOR_MAPS[name]
 end
 
 # Each speed has its own measured torque knots, including its full-load point.
@@ -64,8 +57,8 @@ function motor_operating_speed(map, omega)
     return (; omega=abs(omega), left, right, mix, limit)
 end
 
-motor_torque_limit(name, omega) = motor_operating_speed(motor_map(name), omega).limit
-@register_symbolic motor_torque_limit(name::String, omega)
+motor_torque_limit(file, omega) = motor_operating_speed(motor_map(file), omega).limit
+@register_symbolic motor_torque_limit(file::String, omega)
 
 function curve_loss(curve, fraction)
     torque = fraction * last(curve.torque)
@@ -81,12 +74,12 @@ function motor_input_power(point, torque)
     return point.omega * torque + loss
 end
 
-motor_input_power(name, omega, torque) = motor_input_power(motor_operating_speed(motor_map(name), omega), torque)
-@register_symbolic motor_input_power(name::String, omega, torque)
+motor_input_power(file, omega, torque) = motor_input_power(motor_operating_speed(motor_map(file), omega), torque)
+@register_symbolic motor_input_power(file::String, omega, torque)
 
 """Common torque multiplier under a shared electrical input limit, in watts."""
-function motor_power_scale(name, limit, speeds, requests)
-    map = motor_map(name)
+function motor_power_scale(file, limit, speeds, requests)
+    map = motor_map(file)
     points = ntuple(i -> motor_operating_speed(map, speeds[i]), 4)
     draw(k) = sum(i -> motor_input_power(points[i], k * requests[i]), 1:4)
     draw(1) <= limit && return 1.0
@@ -102,4 +95,4 @@ function motor_power_scale(name, limit, speeds, requests)
     end
     return low
 end
-@register_symbolic motor_power_scale(name::String, limit, speeds::AbstractArray, requests::AbstractArray)
+@register_symbolic motor_power_scale(file::String, limit, speeds::AbstractArray, requests::AbstractArray)

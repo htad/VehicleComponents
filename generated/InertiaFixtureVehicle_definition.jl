@@ -5,13 +5,13 @@
 
 
 @doc Markdown.doc"""
-   InertiaFixtureVehicle(; name, motor_type, heave_damper_compression_front, heave_damper_extension_front, roll_damper_compression_front, roll_damper_extension_front, heave_damper_compression_rear, heave_damper_extension_rear, roll_damper_compression_rear, roll_damper_extension_rear, road_N, road_seed, road_n_min, road_n_max, gear_ratio, vehicle_name, brake_bias, max_brake_torque, sprung_mass, sprung_I_11, sprung_I_22, sprung_I_33, sprung_cg, __overrides)
+   InertiaFixtureVehicle(; name, motor_map_file, heave_damper_compression_front, heave_damper_extension_front, roll_damper_compression_front, roll_damper_extension_front, heave_damper_compression_rear, heave_damper_extension_rear, roll_damper_compression_rear, roll_damper_extension_rear, road_N, road_seed, road_n_min, road_n_max, road_roughness, gear_ratio, vehicle_name, brake_bias, max_brake_torque, sprung_mass, sprung_I_11, sprung_I_22, sprung_I_33, sprung_cg, __overrides)
 
 ## Parameters:
 
 | Name         | Description                         | Units  |   Default value |
 | ------------ | ----------------------------------- | ------ | --------------- |
-| `motor_type`         |                          | --  |    |
+| `motor_map_file`         |                          | --  |    |
 | `heave_damper_compression_front`         |                          | --  |    |
 | `heave_damper_extension_front`         |                          | --  |    |
 | `roll_damper_compression_front`         |                          | --  |    |
@@ -24,6 +24,7 @@
 | `road_seed`         |                          | --  |    |
 | `road_n_min`         |                          | --  |    |
 | `road_n_max`         |                          | --  |    |
+| `road_roughness`         |                          | --  |    |
 | `gear_ratio`         |                          | --  |    |
 | `vehicle_name`         |                          | --  |    |
 | `brake_bias`         |                          | --  |    |
@@ -52,7 +53,7 @@ connectors that can be connected together ([`Frame3D`](@ref))
 | `a_cg`         |                          | m/s2  |
 | `v_cg`         |                          | m/s  |
 """
-@component function InertiaFixtureVehicle(; name = nothing, var"motor_type"=nothing, var"heave_damper_compression_front"=nothing, var"heave_damper_extension_front"=nothing, var"roll_damper_compression_front"=nothing, var"roll_damper_extension_front"=nothing, var"heave_damper_compression_rear"=nothing, var"heave_damper_extension_rear"=nothing, var"roll_damper_compression_rear"=nothing, var"roll_damper_extension_rear"=nothing, var"road_N"=nothing, var"road_seed"=nothing, var"road_n_min"=nothing, var"road_n_max"=nothing, var"gear_ratio"=nothing, var"vehicle_name"=nothing, var"brake_bias"=nothing, var"max_brake_torque"=nothing, var"sprung_mass"=nothing, var"sprung_I_11"=nothing, var"sprung_I_22"=nothing, var"sprung_I_33"=nothing, var"sprung_cg"=nothing, __overrides = Dict{String, Any}())
+@component function InertiaFixtureVehicle(; name = nothing, var"motor_map_file"=nothing, var"heave_damper_compression_front"=nothing, var"heave_damper_extension_front"=nothing, var"roll_damper_compression_front"=nothing, var"roll_damper_extension_front"=nothing, var"heave_damper_compression_rear"=nothing, var"heave_damper_extension_rear"=nothing, var"roll_damper_compression_rear"=nothing, var"roll_damper_extension_rear"=nothing, var"road_N"=nothing, var"road_seed"=nothing, var"road_n_min"=nothing, var"road_n_max"=nothing, var"road_roughness"=nothing, var"gear_ratio"=nothing, var"vehicle_name"=nothing, var"brake_bias"=nothing, var"max_brake_torque"=nothing, var"sprung_mass"=nothing, var"sprung_I_11"=nothing, var"sprung_I_22"=nothing, var"sprung_I_33"=nothing, var"sprung_cg"=nothing, __overrides = Dict{String, Any}())
   isnothing(name) && throw(ArgumentError("""
     The `name` keyword must be provided. Please consider using the `@named` macro,
     like so:
@@ -71,7 +72,7 @@ connectors that can be connected together ([`Frame3D`](@ref))
   __bindings = Dict{Symbolics.SymbolicT, Symbolics.SymbolicT}()
 
   ### Keyword argument overrides
-  haskey(__overrides, "motor_type") && (motor_type = pop!(__overrides, "motor_type"))
+  haskey(__overrides, "motor_map_file") && (motor_map_file = pop!(__overrides, "motor_map_file"))
   haskey(__overrides, "heave_damper_compression_front") && (heave_damper_compression_front = pop!(__overrides, "heave_damper_compression_front"))
   haskey(__overrides, "heave_damper_extension_front") && (heave_damper_extension_front = pop!(__overrides, "heave_damper_extension_front"))
   haskey(__overrides, "roll_damper_compression_front") && (roll_damper_compression_front = pop!(__overrides, "roll_damper_compression_front"))
@@ -84,6 +85,7 @@ connectors that can be connected together ([`Frame3D`](@ref))
   haskey(__overrides, "road_seed") && (road_seed = pop!(__overrides, "road_seed"))
   haskey(__overrides, "road_n_min") && (road_n_min = pop!(__overrides, "road_n_min"))
   haskey(__overrides, "road_n_max") && (road_n_max = pop!(__overrides, "road_n_max"))
+  haskey(__overrides, "road_roughness") && (road_roughness = pop!(__overrides, "road_roughness"))
   haskey(__overrides, "gear_ratio") && (gear_ratio = pop!(__overrides, "gear_ratio"))
   haskey(__overrides, "vehicle_name") && (vehicle_name = pop!(__overrides, "vehicle_name"))
   haskey(__overrides, "brake_bias") && (brake_bias = pop!(__overrides, "brake_bias"))
@@ -174,67 +176,75 @@ connectors that can be connected together ([`Frame3D`](@ref))
   # Subcomponent corner_fl of type VehicleComponents.CornerAssembly
   corner_fl_overrides = __pop_subcomponent_overrides!(__overrides, "corner_fl")
   corner_fl_dict = Dict{String, Any}()
-  corner_fl_dict["motor.motor_type"] = ModelingToolkit.default_to_parentscope(motor_type)
+  corner_fl_dict["motor.motor_map_file"] = ModelingToolkit.default_to_parentscope(motor_map_file)
   corner_fl_dict["motor.gear_ratio"] = ModelingToolkit.default_to_parentscope(ModelingToolkit.default_to_parentscope(gear_ratio))
   corner_fl_dict["wheel_assembly.tire.is_left"] = ModelingToolkit.default_to_parentscope(true)
   corner_fl_dict["wheel_assembly.tire.road.N"] = ModelingToolkit.default_to_parentscope(road_N)
   corner_fl_dict["wheel_assembly.tire.road.seed"] = ModelingToolkit.default_to_parentscope(road_seed)
   corner_fl_dict["wheel_assembly.tire.road.n_min"] = ModelingToolkit.default_to_parentscope(road_n_min)
   corner_fl_dict["wheel_assembly.tire.road.n_max"] = ModelingToolkit.default_to_parentscope(road_n_max)
+  corner_fl_dict["wheel_assembly.tire.road.roughness"] = ModelingToolkit.default_to_parentscope(road_roughness)
   corner_fl_dict["brake.is_front"] = ModelingToolkit.default_to_parentscope(true)
   corner_fl_dict["brake.brake_bias"] = ModelingToolkit.default_to_parentscope(ModelingToolkit.default_to_parentscope(brake_bias))
   corner_fl_dict["brake.max_torque"] = ModelingToolkit.default_to_parentscope(ModelingToolkit.default_to_parentscope(max_brake_torque))
   merge!(corner_fl_dict, corner_fl_overrides)
   push!(__systems, @named corner_fl = VehicleComponents.CornerAssembly(; __overrides = corner_fl_dict))
   __dyad_bind_final!(__bindings, corner_fl, Symbol[:motor], :gear_ratio, gear_ratio)
+  __dyad_bind_final!(__bindings, corner_fl, Symbol[:wheel_assembly, :tire, :road], :roughness, road_roughness)
   # Subcomponent corner_fr of type VehicleComponents.CornerAssembly
   corner_fr_overrides = __pop_subcomponent_overrides!(__overrides, "corner_fr")
   corner_fr_dict = Dict{String, Any}()
-  corner_fr_dict["motor.motor_type"] = ModelingToolkit.default_to_parentscope(motor_type)
+  corner_fr_dict["motor.motor_map_file"] = ModelingToolkit.default_to_parentscope(motor_map_file)
   corner_fr_dict["motor.gear_ratio"] = ModelingToolkit.default_to_parentscope(ModelingToolkit.default_to_parentscope(gear_ratio))
   corner_fr_dict["wheel_assembly.tire.is_left"] = ModelingToolkit.default_to_parentscope(false)
   corner_fr_dict["wheel_assembly.tire.road.N"] = ModelingToolkit.default_to_parentscope(road_N)
   corner_fr_dict["wheel_assembly.tire.road.seed"] = ModelingToolkit.default_to_parentscope(road_seed)
   corner_fr_dict["wheel_assembly.tire.road.n_min"] = ModelingToolkit.default_to_parentscope(road_n_min)
   corner_fr_dict["wheel_assembly.tire.road.n_max"] = ModelingToolkit.default_to_parentscope(road_n_max)
+  corner_fr_dict["wheel_assembly.tire.road.roughness"] = ModelingToolkit.default_to_parentscope(road_roughness)
   corner_fr_dict["brake.is_front"] = ModelingToolkit.default_to_parentscope(true)
   corner_fr_dict["brake.brake_bias"] = ModelingToolkit.default_to_parentscope(ModelingToolkit.default_to_parentscope(brake_bias))
   corner_fr_dict["brake.max_torque"] = ModelingToolkit.default_to_parentscope(ModelingToolkit.default_to_parentscope(max_brake_torque))
   merge!(corner_fr_dict, corner_fr_overrides)
   push!(__systems, @named corner_fr = VehicleComponents.CornerAssembly(; __overrides = corner_fr_dict))
   __dyad_bind_final!(__bindings, corner_fr, Symbol[:motor], :gear_ratio, gear_ratio)
+  __dyad_bind_final!(__bindings, corner_fr, Symbol[:wheel_assembly, :tire, :road], :roughness, road_roughness)
   # Subcomponent corner_rl of type VehicleComponents.CornerAssembly
   corner_rl_overrides = __pop_subcomponent_overrides!(__overrides, "corner_rl")
   corner_rl_dict = Dict{String, Any}()
-  corner_rl_dict["motor.motor_type"] = ModelingToolkit.default_to_parentscope(motor_type)
+  corner_rl_dict["motor.motor_map_file"] = ModelingToolkit.default_to_parentscope(motor_map_file)
   corner_rl_dict["motor.gear_ratio"] = ModelingToolkit.default_to_parentscope(ModelingToolkit.default_to_parentscope(gear_ratio))
   corner_rl_dict["wheel_assembly.tire.is_left"] = ModelingToolkit.default_to_parentscope(true)
   corner_rl_dict["wheel_assembly.tire.road.N"] = ModelingToolkit.default_to_parentscope(road_N)
   corner_rl_dict["wheel_assembly.tire.road.seed"] = ModelingToolkit.default_to_parentscope(road_seed)
   corner_rl_dict["wheel_assembly.tire.road.n_min"] = ModelingToolkit.default_to_parentscope(road_n_min)
   corner_rl_dict["wheel_assembly.tire.road.n_max"] = ModelingToolkit.default_to_parentscope(road_n_max)
+  corner_rl_dict["wheel_assembly.tire.road.roughness"] = ModelingToolkit.default_to_parentscope(road_roughness)
   corner_rl_dict["brake.is_front"] = ModelingToolkit.default_to_parentscope(false)
   corner_rl_dict["brake.brake_bias"] = ModelingToolkit.default_to_parentscope(ModelingToolkit.default_to_parentscope(brake_bias))
   corner_rl_dict["brake.max_torque"] = ModelingToolkit.default_to_parentscope(ModelingToolkit.default_to_parentscope(max_brake_torque))
   merge!(corner_rl_dict, corner_rl_overrides)
   push!(__systems, @named corner_rl = VehicleComponents.CornerAssembly(; __overrides = corner_rl_dict))
   __dyad_bind_final!(__bindings, corner_rl, Symbol[:motor], :gear_ratio, gear_ratio)
+  __dyad_bind_final!(__bindings, corner_rl, Symbol[:wheel_assembly, :tire, :road], :roughness, road_roughness)
   # Subcomponent corner_rr of type VehicleComponents.CornerAssembly
   corner_rr_overrides = __pop_subcomponent_overrides!(__overrides, "corner_rr")
   corner_rr_dict = Dict{String, Any}()
-  corner_rr_dict["motor.motor_type"] = ModelingToolkit.default_to_parentscope(motor_type)
+  corner_rr_dict["motor.motor_map_file"] = ModelingToolkit.default_to_parentscope(motor_map_file)
   corner_rr_dict["motor.gear_ratio"] = ModelingToolkit.default_to_parentscope(ModelingToolkit.default_to_parentscope(gear_ratio))
   corner_rr_dict["wheel_assembly.tire.is_left"] = ModelingToolkit.default_to_parentscope(false)
   corner_rr_dict["wheel_assembly.tire.road.N"] = ModelingToolkit.default_to_parentscope(road_N)
   corner_rr_dict["wheel_assembly.tire.road.seed"] = ModelingToolkit.default_to_parentscope(road_seed)
   corner_rr_dict["wheel_assembly.tire.road.n_min"] = ModelingToolkit.default_to_parentscope(road_n_min)
   corner_rr_dict["wheel_assembly.tire.road.n_max"] = ModelingToolkit.default_to_parentscope(road_n_max)
+  corner_rr_dict["wheel_assembly.tire.road.roughness"] = ModelingToolkit.default_to_parentscope(road_roughness)
   corner_rr_dict["brake.is_front"] = ModelingToolkit.default_to_parentscope(false)
   corner_rr_dict["brake.brake_bias"] = ModelingToolkit.default_to_parentscope(ModelingToolkit.default_to_parentscope(brake_bias))
   corner_rr_dict["brake.max_torque"] = ModelingToolkit.default_to_parentscope(ModelingToolkit.default_to_parentscope(max_brake_torque))
   merge!(corner_rr_dict, corner_rr_overrides)
   push!(__systems, @named corner_rr = VehicleComponents.CornerAssembly(; __overrides = corner_rr_dict))
   __dyad_bind_final!(__bindings, corner_rr, Symbol[:motor], :gear_ratio, gear_ratio)
+  __dyad_bind_final!(__bindings, corner_rr, Symbol[:wheel_assembly, :tire, :road], :roughness, road_roughness)
   # Subcomponent front_suspension of type VehicleComponents.Suspension
   front_suspension_overrides = __pop_subcomponent_overrides!(__overrides, "front_suspension")
   push!(__systems, @named front_suspension = VehicleComponents.Suspension(; heave_dataset=VehicleComponents.damper_dataset(heave_damper_compression_front, heave_damper_extension_front), roll_dataset=VehicleComponents.damper_dataset(roll_damper_compression_front, roll_damper_extension_front), __overrides = front_suspension_overrides))
@@ -243,7 +253,7 @@ connectors that can be connected together ([`Frame3D`](@ref))
   push!(__systems, @named rear_suspension = VehicleComponents.Suspension(; heave_dataset=VehicleComponents.damper_dataset(heave_damper_compression_rear, heave_damper_extension_rear), roll_dataset=VehicleComponents.damper_dataset(roll_damper_compression_rear, roll_damper_extension_rear), __overrides = rear_suspension_overrides))
   # Subcomponent control of type VehicleComponents.VehicleControl
   control_overrides = __pop_subcomponent_overrides!(__overrides, "control")
-  push!(__systems, @named control = VehicleComponents.VehicleControl(; motor_type=motor_type, __overrides = control_overrides))
+  push!(__systems, @named control = VehicleComponents.VehicleControl(; motor_map_file=motor_map_file, __overrides = control_overrides))
   # Subcomponent aero of type VehicleComponents.AeroLoad
   aero_overrides = __pop_subcomponent_overrides!(__overrides, "aero")
   push!(__systems, @named aero = VehicleComponents.AeroLoad(; __overrides = aero_overrides))

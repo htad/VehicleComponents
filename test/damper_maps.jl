@@ -4,7 +4,7 @@ using VehicleComponents
 using ModelingToolkit
 
 @testset "Multimatic damper catalog" begin
-    asset_dir = joinpath(@__DIR__, "..", "assets", "dampers")
+    asset_dir = joinpath(@__DIR__, "..", "assets", "public", "dampers")
     names = [
         "$(architecture)_$(code)_$(direction)_$(lpad(position, 2, '0')).csv"
         for architecture in ("heave", "roll")
@@ -15,7 +15,7 @@ using ModelingToolkit
     @test Set(filter(name -> endswith(name, ".csv"), readdir(asset_dir))) == Set(names)
     speeds = [0, 10, 25, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500] ./ 1000
     for name in names
-        curve = build_table(DyadTimeseries("dyad://VehicleComponents/dampers/$name";
+        curve = build_table(DyadTimeseries("dyad://VehicleComponents/public/dampers/$name";
             independent_var="velocity", dependent_vars=["force"]))
         @test curve.velocity == speeds
         @test all(isfinite, curve.force)
@@ -25,13 +25,13 @@ using ModelingToolkit
 end
 
 @testset "Independent damper directions" begin
-    compression = "dampers/heave_VC03_compression_02.csv"
-    extension = "dampers/heave_VC03_extension_02.csv"
+    compression = "public/dampers/heave_VC03_compression_02.csv"
+    extension = "public/dampers/heave_VC03_extension_02.csv"
     baseline = build_table(VehicleComponents.damper_dataset(compression, extension))
     rebound = build_table(VehicleComponents.damper_dataset(
-        compression, "dampers/heave_VC03_extension_07.csv"))
+        compression, "public/dampers/heave_VC03_extension_07.csv"))
     bump = build_table(VehicleComponents.damper_dataset(
-        "dampers/heave_VC03_compression_07.csv", extension))
+        "public/dampers/heave_VC03_compression_07.csv", extension))
 
     @test baseline.velocity == rebound.velocity == bump.velocity
     @test all(>(0), diff(baseline.velocity))
@@ -56,7 +56,7 @@ end
         @test constructor(; name=:fixture) isa ModelingToolkit.System
     end
     model = FullVehicleTestStraightLine(; name=:model, __overrides=Dict(
-        "vehicle.heave_damper_extension_front" => "dampers/heave_VC03_extension_07.csv",
+        "vehicle.heave_damper_extension_front" => "public/dampers/heave_VC03_extension_07.csv",
     ))
     force_map = model.vehicle.front_suspension.inboard.heave_strut.damper.force_map
     velocity = ModelingToolkit.getdefault(force_map.independent_var)
