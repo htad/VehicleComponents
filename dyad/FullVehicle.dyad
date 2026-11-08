@@ -23,17 +23,18 @@ component FullVehicle
   ) {^body}
   corner_fl = VehicleComponents.CornerAssembly(
     motor(
-      final motor_type = motor_type,
+      final motor_map_file = motor_map_file,
       final gear_ratio = gear_ratio
     ),
     wheel_assembly(
       tire(
         is_left = true,
         road(
-          N = road_N,
-          seed = road_seed,
-          n_min = road_n_min,
-          n_max = road_n_max
+          final N = road_N,
+          final seed = road_seed,
+          final n_min = road_n_min,
+          final n_max = road_n_max,
+          final roughness = road_roughness
         )
       )
     ),
@@ -45,17 +46,18 @@ component FullVehicle
   ) {^corner_fl}
   corner_fr = VehicleComponents.CornerAssembly(
     motor(
-      final motor_type = motor_type,
+      final motor_map_file = motor_map_file,
       final gear_ratio = gear_ratio
     ),
     wheel_assembly(
       tire(
         is_left = false,
         road(
-          N = road_N,
-          seed = road_seed,
-          n_min = road_n_min,
-          n_max = road_n_max
+          final N = road_N,
+          final seed = road_seed,
+          final n_min = road_n_min,
+          final n_max = road_n_max,
+          final roughness = road_roughness
         )
       )
     ),
@@ -67,17 +69,18 @@ component FullVehicle
   ) {^corner_fr}
   corner_rl = VehicleComponents.CornerAssembly(
     motor(
-      final motor_type = motor_type,
+      final motor_map_file = motor_map_file,
       final gear_ratio = gear_ratio
     ),
     wheel_assembly(
       tire(
         is_left = true,
         road(
-          N = road_N,
-          seed = road_seed,
-          n_min = road_n_min,
-          n_max = road_n_max
+          final N = road_N,
+          final seed = road_seed,
+          final n_min = road_n_min,
+          final n_max = road_n_max,
+          final roughness = road_roughness
         )
       )
     ),
@@ -89,17 +92,18 @@ component FullVehicle
   ) {^corner_rl}
   corner_rr = VehicleComponents.CornerAssembly(
     motor(
-      final motor_type = motor_type,
+      final motor_map_file = motor_map_file,
       final gear_ratio = gear_ratio
     ),
     wheel_assembly(
       tire(
         is_left = false,
         road(
-          N = road_N,
-          seed = road_seed,
-          n_min = road_n_min,
-          n_max = road_n_max
+          final N = road_N,
+          final seed = road_seed,
+          final n_min = road_n_min,
+          final n_max = road_n_max,
+          final roughness = road_roughness
         )
       )
     ),
@@ -129,11 +133,11 @@ component FullVehicle
       roll_damper_extension_rear
     )
   ) {^rear_suspension}
-  control = VehicleComponents.VehicleControl(final motor_type = motor_type) {^control}
+  control = VehicleComponents.VehicleControl(final motor_map_file = motor_map_file) {^control}
   aero = VehicleComponents.AeroLoad() {^aero}
   body_angles = MultibodyComponents.AbsoluteAngles(sequence = [3, 2, 1]) {^body_angles}
 
-  structural parameter motor_type::String
+  structural parameter motor_map_file::String
   structural parameter heave_damper_compression_front::String
   structural parameter heave_damper_extension_front::String
   structural parameter roll_damper_compression_front::String
@@ -146,6 +150,7 @@ component FullVehicle
   structural parameter road_seed::Integer
   structural parameter road_n_min::Real
   structural parameter road_n_max::Real
+  structural parameter road_roughness::Real
 
   parameter gear_ratio::Real
   parameter vehicle_name::String

@@ -38,7 +38,7 @@ test component FullVehicleTestStraightLine
   yaw_lock = RotationalComponents.Components.Fixed(phi0 = 0.0) {^yaw_lock}
   
   vehicle = VehicleComponents.FullVehicle(
-    apply "dyad://VehicleComponents/TestVehicle.toml"
+    apply "dyad://VehicleComponents/public/vehicles/Test.toml"
   ) {^vehicle}
 
   track = VehicleComponents.StraightLineTrack() {^track}

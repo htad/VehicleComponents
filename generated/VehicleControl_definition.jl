@@ -5,13 +5,13 @@
 
 
 @doc Markdown.doc"""
-   VehicleControl(; name, motor_type, total_max_power, __overrides)
+   VehicleControl(; name, motor_map_file, total_max_power, __overrides)
 
 ## Parameters:
 
 | Name         | Description                         | Units  |   Default value |
 | ------------ | ----------------------------------- | ------ | --------------- |
-| `motor_type`         |                          | --  |    |
+| `motor_map_file`         |                          | --  |    |
 | `total_max_power`         |                          | W  |    |
 
 ## Connectors
@@ -25,7 +25,7 @@
 | ------------ | ----------------------------------- | ------ |
 | `power_scale`         |                          | --  |
 """
-@component function VehicleControl(; name = nothing, var"motor_type"=nothing, var"total_max_power"=nothing, __overrides = Dict{String, Any}())
+@component function VehicleControl(; name = nothing, var"motor_map_file"=nothing, var"total_max_power"=nothing, __overrides = Dict{String, Any}())
   isnothing(name) && throw(ArgumentError("""
     The `name` keyword must be provided. Please consider using the `@named` macro,
     like so:
@@ -44,7 +44,7 @@
   __bindings = Dict{Symbolics.SymbolicT, Symbolics.SymbolicT}()
 
   ### Keyword argument overrides
-  haskey(__overrides, "motor_type") && (motor_type = pop!(__overrides, "motor_type"))
+  haskey(__overrides, "motor_map_file") && (motor_map_file = pop!(__overrides, "motor_map_file"))
   haskey(__overrides, "total_max_power") && (total_max_power = pop!(__overrides, "total_max_power"))
 
   ### Structural Parameters (functions)
@@ -118,7 +118,7 @@
   push!(__eqs, outputs.demand_rl ~ tc.outputs.demand_rl * power_scale)
   push!(__eqs, outputs.demand_rr ~ tc.outputs.demand_rr * power_scale)
   push!(__eqs, outputs.brake_demand ~ abs.outputs.brake_demand)
-  push!(__eqs, power_scale ~ VehicleComponents.motor_power_scale(motor_type, total_max_power, [inputs.motor_speed_fl, inputs.motor_speed_fr, inputs.motor_speed_rl, inputs.motor_speed_rr], [tc.outputs.demand_fl * inputs.available_torque_fl, tc.outputs.demand_fr * inputs.available_torque_fr, tc.outputs.demand_rl * inputs.available_torque_rl, tc.outputs.demand_rr * inputs.available_torque_rr]))
+  push!(__eqs, power_scale ~ VehicleComponents.motor_power_scale(motor_map_file, total_max_power, [inputs.motor_speed_fl, inputs.motor_speed_fr, inputs.motor_speed_rl, inputs.motor_speed_rr], [tc.outputs.demand_fl * inputs.available_torque_fl, tc.outputs.demand_fr * inputs.available_torque_fr, tc.outputs.demand_rl * inputs.available_torque_rl, tc.outputs.demand_rr * inputs.available_torque_rr]))
 
   # Return completely constructed System
   return System(__eqs, ModelingToolkit.t_nounits, __vars, __params; systems=__systems, initial_conditions=__initial_conditions, guesses=__guesses, name, initialization_eqs=__initialization_eqs, bindings=__bindings, assertions=__assertions)

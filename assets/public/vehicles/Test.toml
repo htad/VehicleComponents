@@ -1,12 +1,13 @@
 vehicle_name = "TestVehicle"
 
-motor_type = "AMK"
+motor_map_file = "public/motors/AMK.csv"
 gear_ratio = 14.0
 
 road_N = 64
 road_seed = 1
 road_n_min = 0.02
 road_n_max = 3.0
+road_roughness = 16e-6 # ISO class A
 
 sprung_mass = 250.0
 sprung_I_11 = 30.0
@@ -17,14 +18,14 @@ brake_bias = 0.6
 max_brake_torque = 250.0
 
 # The filenames select the valve code and position independently for each direction.
-heave_damper_compression_front = "dampers/heave_VC03_compression_02.csv"
-heave_damper_extension_front = "dampers/heave_VC03_extension_02.csv"
-roll_damper_compression_front = "dampers/roll_VC01_compression_03.csv"
-roll_damper_extension_front = "dampers/roll_VC01_extension_03.csv"
-heave_damper_compression_rear = "dampers/heave_VC01_compression_04.csv"
-heave_damper_extension_rear = "dampers/heave_VC01_extension_04.csv"
-roll_damper_compression_rear = "dampers/roll_VC01_compression_05.csv"
-roll_damper_extension_rear = "dampers/roll_VC01_extension_05.csv"
+heave_damper_compression_front = "public/dampers/heave_VC03_compression_02.csv"
+heave_damper_extension_front = "public/dampers/heave_VC03_extension_02.csv"
+roll_damper_compression_front = "public/dampers/roll_VC01_compression_03.csv"
+roll_damper_extension_front = "public/dampers/roll_VC01_extension_03.csv"
+heave_damper_compression_rear = "public/dampers/heave_VC01_compression_04.csv"
+heave_damper_extension_rear = "public/dampers/heave_VC01_extension_04.csv"
+roll_damper_compression_rear = "public/dampers/roll_VC01_compression_05.csv"
+roll_damper_extension_rear = "public/dampers/roll_VC01_extension_05.csv"
 
 [corner_fl]
 upright_mass = 5.0
@@ -38,9 +39,6 @@ rim_inertia = 0.05
 tire_mass = 9.3
 tire_inertia = 0.736
 
-[corner_fl.wheel_assembly.tire.road]
-roughness = 0.0
-
 [corner_fr]
 upright_mass = 5.0
 
@@ -52,9 +50,6 @@ rim_mass = 3.0
 rim_inertia = 0.05
 tire_mass = 9.3
 tire_inertia = 0.736
-
-[corner_fr.wheel_assembly.tire.road]
-roughness = 0.0
 
 [corner_rl]
 upright_mass = 5.0
@@ -68,9 +63,6 @@ rim_inertia = 0.05
 tire_mass = 9.3
 tire_inertia = 0.736
 
-[corner_rl.wheel_assembly.tire.road]
-roughness = 0.0
-
 [corner_rr]
 upright_mass = 5.0
 
@@ -82,9 +74,6 @@ rim_mass = 3.0
 rim_inertia = 0.05
 tire_mass = 9.3
 tire_inertia = 0.736
-
-[corner_rr.wheel_assembly.tire.road]
-roughness = 0.0
 
 [front_suspension]
 wheel_center_left = [0.0, 0.6, 0.3135]

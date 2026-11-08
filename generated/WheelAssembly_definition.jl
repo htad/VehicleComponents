@@ -413,9 +413,9 @@ connectors that can be connected together ([`Frame3D`](@ref))
     "visual.width" => (base="Real", dims=Int[], min=nothing, max=nothing, structural=false, final=false, initial=true, guess=true),
     "visual.height" => (base="Real", dims=Int[], min=nothing, max=nothing, structural=false, final=false, initial=true, guess=true),
   )
-  __tire_apply_1 = __dyad_load_parameters(pkgdir(@__MODULE__), String(nameof(Base.moduleroot(@__MODULE__))), "dyad://VehicleComponents/TestTire.toml")
+  __tire_apply_1 = __dyad_load_parameters(pkgdir(@__MODULE__), String(nameof(Base.moduleroot(@__MODULE__))), "dyad://VehicleComponents/public/tires/Test_MF.toml")
   __tire_apply_1_flat = __dyad_flatten(__tire_apply_1)
-  __dyad_check_apply(__tire_apply_1_flat, __tire_apply_schema, "dyad://VehicleComponents/TestTire.toml")
+  __dyad_check_apply(__tire_apply_1_flat, __tire_apply_schema, "dyad://VehicleComponents/public/tires/Test_MF.toml")
   __tire_apply_1_ovr = __dyad_apply_overrides(__tire_apply_1, __tire_apply_1_flat, __tire_apply_exclude, __tire_apply_schema)
   tire_dict = Dict{String, Any}()
   merge!(tire_dict, __tire_apply_1_ovr)

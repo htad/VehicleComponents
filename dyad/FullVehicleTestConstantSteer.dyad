@@ -36,7 +36,7 @@ test component FullVehicleTestConstantSteer
   yaw_joint = MultibodyComponents.Revolute(n = [0, 0, 1], render = false) {^yaw_joint}
 
   vehicle = VehicleComponents.FullVehicle(
-    apply "dyad://VehicleComponents/TestVehicle.toml"
+    apply "dyad://VehicleComponents/public/vehicles/Test.toml"
   ) {^vehicle}
 
   parameter steer_angle::Angle = 0.05

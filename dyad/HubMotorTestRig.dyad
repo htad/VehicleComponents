@@ -3,7 +3,7 @@ test component HubMotorTestRig
 
   world = MultibodyComponents.World(n = [0, 0, -1], render = false) {^world}
   motor = VehicleComponents.HubMotor(
-    final motor_type = motor_type,
+    final motor_map_file = motor_map_file,
     gear_ratio = gear_ratio
   ) {^motor}
   ground = RotationalComponents.Components.Fixed() {^ground}
@@ -11,7 +11,7 @@ test component HubMotorTestRig
     ref_type = RotationalComponents.Sources.ReferenceType.Exact()
   ) {^drive}
   
-  structural parameter motor_type::String = "AMK"
+  structural parameter motor_map_file::String = "public/motors/AMK.csv"
 
   parameter gear_ratio::Real = 14
   parameter demand::Real = 1

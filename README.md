@@ -34,27 +34,46 @@ Select the profile in each Dyad test rig:
 
 ```dyad
 vehicle = VehicleComponents.FullVehicle(
-  apply "dyad://VehicleComponents/TestVehicle.toml"
+  apply "dyad://VehicleComponents/public/vehicles/Test.toml"
 )
 ```
 
-Switch to `MR26.toml` or `MR27.toml` and regenerate. MR profiles are ignored by Git. Editing TOML values only requires a new model instance.
+With access to the private data repository, run `git submodule update --init assets/private` from the project root. To select a private profile, use `dyad://VehicleComponents/private/vehicles/MR26.toml` or `dyad://VehicleComponents/private/vehicles/MR27.toml` and regenerate. Editing TOML values only requires a new model instance.
 
-All four wheels load `assets/TestTire.toml` by default. To use the Hoosier R20, change the tire’s `apply` line in `dyad/WheelAssembly.dyad` to `apply "dyad://VehicleComponents/R20.toml"`, regenerate, and construct a new model. This selects the tire for TestVehicle, MR26, and MR27. Wheel masses and inertias also belong to the vehicle.
+For the public test tire, use `dyad://VehicleComponents/public/tires/Test_MF.toml`. To use the Hoosier R20, change the tire’s `apply` line in `dyad/WheelAssembly.dyad` to `apply "dyad://VehicleComponents/private/tires/R20_MF.toml"`, regenerate, and construct a new model. This selects the tire for TestVehicle, MR26, and MR27. Wheel masses and inertias also belong to the vehicle.
 
 Select damper compression/extension CSVs independently, e.g. `heave_VC03_extension_07.csv`. Files use m/s and N; the loader converts published force signs. Source: Multimatic DSSV Valve Code Offerings, 2022-04-25.
 
 ## Hub motors
 
-Set `motor_type` once at the top of the vehicle TOML to `"AMK"` (default), `"F-MOT"`, or `"MRM"`. The selected map supplies the available shaft torque at each speed.
+Set `motor_map_file` once at the top of the vehicle TOML, using an assets-relative CSV path like the damper files:
+
+```toml
+motor_map_file = "public/motors/AMK.csv"
+```
+
+Use `"public/motors/F-MOT.csv"`, `"private/motors/MRM.csv"`. CSV columns are `rpm,torque_Nm,loss_W`, grouped by increasing speed, with increasing torque samples starting at zero for each speed. The selected map supplies the available shaft torque and electrical losses. Loaded maps are cached for solver evaluations; restart Julia after editing the contents of a loaded CSV.
 
 ### Calibration sources
 
 | Motor | Torque envelope and losses |
 | --- | --- |
-| AMK | Fixed A2370DD 100 °C map. At each speed, follow the increasing shaft-torque branch as current rises. Interpolate the zero-shaft-torque point. Use total loss minus mechanical loss. |
+| AMK | Fixed A2370DD 100 °C map. At each speed, follow the increasing shaft-torque branch as current rises. Interpolate the zero-shaft-torque point.|
 | F-MOT | Use the field-weakening workbook's peak feasible torque at each RMS current and speed. Infer the least current required for a requested torque, then add the separate iron and conductive losses. The zero-torque field-weakening boundary is estimated from the last two available angle samples. The copper data ends at 65 A, so the 66 A point uses the 65 A loss scaled by current squared. |
 | MRM | Use the 66 A, 424 V line-to-line RMS performance export at 20 °C. Use `torqueCurve` and the feasible `lossMap` cells, with `lossCurve` at full torque. The repeated 20,000 rpm point closes the plotted outline. The powered endpoint is 20.953 N·m. |
+
+### Losses in the motor CSVs
+
+`loss_W` is the loss of one motor at the row's shaft torque and speed. It includes the two categories reported for all three motors.
+
+| Loss category | AMK | F-MOT | MRM |
+| --- | --- | --- | --- |
+| Winding | `Stator_Copper_Loss` | `Conductive loss` | `Joule` |
+| Iron | `Iron_Loss` | `Total iron loss` | `Stator iron` |
+| Separate magnet loss (not included) | `Magnet_Loss` reported separately | No separate value supplied | No separate value supplied |
+| Mechanical loss (not included) | `Mechanical_Loss` reported separately | No separate value supplied | `Mechanical` is zero at every mapped point |
+
+AMK and F-MOT supply aggregate iron loss. Their data do not split stator and rotor contributions. MRM explicitly reports stator iron loss.
 
 ## Dyad Conventions
 

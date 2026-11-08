@@ -11,7 +11,7 @@ component WheelAssembly
   spline = Dyad.Spline() {^spline}
   wheel_center = Dyad.Frame3D() {^wheel_center}
   tire = VehicleComponents.TireMF61(
-    apply "dyad://VehicleComponents/TestTire.toml"
+    apply "dyad://VehicleComponents/public/tires/Test_MF.toml"
   ) {^tire}
   spin = RotationalComponents.Components.Inertia(J = spin_inertia) {^spin}
   wheel_body = MultibodyComponents.Body(

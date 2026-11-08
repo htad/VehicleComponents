@@ -5,13 +5,13 @@
 
 
 @doc Markdown.doc"""
-   HubMotor(; name, motor_type, gear_ratio, __overrides)
+   HubMotor(; name, motor_map_file, gear_ratio, __overrides)
 
 ## Parameters:
 
 | Name         | Description                         | Units  |   Default value |
 | ------------ | ----------------------------------- | ------ | --------------- |
-| `motor_type`         |                          | --  |    |
+| `motor_map_file`         |                          | --  |    |
 | `gear_ratio`         |                          | --  |    |
 
 ## Connectors
@@ -22,7 +22,7 @@
 connectors that can be connected together ([`Frame3D`](@ref))
  * `spline` - This connector represents a rotational spline with angle and torque as the potential and flow variables, respectively. ([`Spline`](@ref))
 """
-@component function HubMotor(; name = nothing, var"motor_type"=nothing, var"gear_ratio"=nothing, __overrides = Dict{String, Any}())
+@component function HubMotor(; name = nothing, var"motor_map_file"=nothing, var"gear_ratio"=nothing, __overrides = Dict{String, Any}())
   isnothing(name) && throw(ArgumentError("""
     The `name` keyword must be provided. Please consider using the `@named` macro,
     like so:
@@ -41,7 +41,7 @@ connectors that can be connected together ([`Frame3D`](@ref))
   __bindings = Dict{Symbolics.SymbolicT, Symbolics.SymbolicT}()
 
   ### Keyword argument overrides
-  haskey(__overrides, "motor_type") && (motor_type = pop!(__overrides, "motor_type"))
+  haskey(__overrides, "motor_map_file") && (motor_map_file = pop!(__overrides, "motor_map_file"))
   haskey(__overrides, "gear_ratio") && (gear_ratio = pop!(__overrides, "gear_ratio"))
 
   ### Structural Parameters (functions)
@@ -91,11 +91,11 @@ connectors that can be connected together ([`Frame3D`](@ref))
   ### Equations
   push!(__eqs, outputs.omega ~ ModelingToolkit.D_nounits(spline.phi))
   push!(__eqs, outputs.motor_speed ~ outputs.omega * gear_ratio)
-  push!(__eqs, outputs.available_torque ~ VehicleComponents.motor_torque_limit(motor_type, outputs.motor_speed))
+  push!(__eqs, outputs.available_torque ~ VehicleComponents.motor_torque_limit(motor_map_file, outputs.motor_speed))
   push!(__eqs, outputs.tau_motor ~ min(1, max(0, inputs.demand)) * outputs.available_torque)
   push!(__eqs, outputs.tau_wheel ~ outputs.tau_motor * gear_ratio)
   push!(__eqs, outputs.shaft_power ~ outputs.tau_motor * outputs.motor_speed)
-  push!(__eqs, outputs.electrical_power ~ VehicleComponents.motor_input_power(motor_type, outputs.motor_speed, outputs.tau_motor))
+  push!(__eqs, outputs.electrical_power ~ VehicleComponents.motor_input_power(motor_map_file, outputs.motor_speed, outputs.tau_motor))
   push!(__eqs, spline.tau ~ -outputs.tau_wheel)
   push!(__eqs, wheel_center.f ~ [0, 0, 0])
   push!(__eqs, wheel_center.tau ~ [0, 1, 0] * outputs.tau_wheel)
